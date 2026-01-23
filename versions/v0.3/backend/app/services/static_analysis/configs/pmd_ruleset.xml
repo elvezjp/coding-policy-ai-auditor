@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<ruleset name="Custom PMD Rules"
+    xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+  <description>Custom PMD ruleset for Java code analysis</description>
+
+  <!-- ベストプラクティス -->
+  <rule ref="category/java/bestpractices.xml/UnusedPrivateField"/>
+  <rule ref="category/java/bestpractices.xml/UnusedLocalVariable"/>
+  <rule ref="category/java/bestpractices.xml/UnusedFormalParameter"/>
+  <rule ref="category/java/bestpractices.xml/UnusedPrivateMethod"/>
+
+  <!-- コードスタイル -->
+  <rule ref="category/java/codestyle.xml/EmptyMethodInAbstractClassShouldBeAbstract"/>
+  <rule ref="category/java/codestyle.xml/UselessParentheses"/>
+
+  <!-- デザイン -->
+  <rule ref="category/java/design.xml/SimplifyBooleanReturns"/>
+  <rule ref="category/java/design.xml/SimplifyBooleanExpressions"/>
+  <rule ref="category/java/design.xml/AvoidDeeplyNestedIfStmts">
+    <properties>
+      <property name="problemDepth" value="3"/>
+    </properties>
+  </rule>
+
+  <!-- エラー処理 -->
+  <rule ref="category/java/errorprone.xml/EmptyCatchBlock"/>
+  <rule ref="category/java/errorprone.xml/AvoidBranchingStatementAsLastInLoop"/>
+  <rule ref="category/java/errorprone.xml/CloseResource"/>
+  <rule ref="category/java/errorprone.xml/EmptyFinalizer"/>
+  <rule ref="category/java/errorprone.xml/UnconditionalIfStatement"/>
+
+  <!-- パフォーマンス -->
+  <rule ref="category/java/performance.xml/AvoidInstantiatingObjectsInLoops"/>
+  <rule ref="category/java/performance.xml/StringInstantiation"/>
+  <rule ref="category/java/performance.xml/StringToString"/>
+</ruleset>
