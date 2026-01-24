@@ -14,6 +14,10 @@ An LLM-powered auditor that checks Java code compliance with **judgment-based co
 This tool applies coding standards "one by one" to the code, **identifies violations with specific line numbers**, and **outputs suggested fixes**.
 Since judgment-based rules are inherently difficult to determine absolutely, **ambiguous cases are reported as violations with a `Requires Review:` prefix**, designed to facilitate human review.
 
+
+https://github.com/user-attachments/assets/8e52e2da-aad2-4572-acd8-396f618302b1
+
+
 ---
 
 ## Setup Instructions
