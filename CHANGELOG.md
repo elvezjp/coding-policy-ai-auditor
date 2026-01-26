@@ -5,7 +5,7 @@
 フォーマットは [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) に基づいており、
 このプロジェクトは [セマンティックバージョニング](https://semver.org/lang/ja/) に準拠しています。
 
-## [0.3.0] - 2026-01-23
+## [0.3.0] - 2026-01-26
 
 ### 追加
 - **マルチLLMプロバイダー対応**: AWS Bedrock / OpenAI / Anthropic を切り替えて監査実行が可能に
@@ -18,6 +18,7 @@
 ### 変更
 - **フロントエンド刷新**: Vite + React 19 + TypeScript + Tailwind CSS によるモダンなSPA構成
 - **バックエンド改善**: FastAPI + Python 3.10+ による高速なAPI
+- **excel2md v2.0対応**: git subtreeを更新しv2.0に対応
 
 ### 注意
 - v0.1との後方互換性はありません
