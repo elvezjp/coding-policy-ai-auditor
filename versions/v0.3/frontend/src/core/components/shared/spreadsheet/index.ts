@@ -11,4 +11,5 @@ export type {
   SpreadsheetViewerProps,
   SpreadsheetParseResult,
   ExcelSpreadsheetLoaderProps,
+  SpreadsheetRowSelection,
 } from './types';

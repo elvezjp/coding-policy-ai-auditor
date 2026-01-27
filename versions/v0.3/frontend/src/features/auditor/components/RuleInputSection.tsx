@@ -3,10 +3,14 @@
  * AIオーディター形式とExcelマークダウン変換をタブで切り替え
  */
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import { Download, ChevronDown, ChevronRight } from 'lucide-react'
 import { Tabs, ExcelSpreadsheetLoader } from '@core/index'
-import type { SpreadsheetParseResult, SpreadsheetSheet } from '@core/components/shared/spreadsheet'
+import type {
+  SpreadsheetParseResult,
+  SpreadsheetSheet,
+  SpreadsheetRowSelection,
+} from '@core/components/shared/spreadsheet'
 import type { DesignFile, ConversionTool } from '../types'
 import { parseAuditorExcelSpreadsheet, convertSheetsToMarkdown } from '../services/auditorExcelApi'
 import { SpecFileList } from './SpecFileList'
@@ -65,7 +69,72 @@ export function RuleInputSection({
   const [auditorSheets, setAuditorSheets] = useState<SpreadsheetSheet[]>([])
   const [auditorMarkdown, setAuditorMarkdown] = useState<string>('')
   const [_auditorFilename, setAuditorFilename] = useState<string>('')
+  const [auditorSelection, setAuditorSelection] = useState<SpreadsheetRowSelection>({})
   const [isAuditorPreviewOpen, setIsAuditorPreviewOpen] = useState(true)
+  const selectionDebounceRef = useRef<number | null>(null)
+
+  const clearSelectionDebounce = useCallback(() => {
+    if (selectionDebounceRef.current !== null) {
+      window.clearTimeout(selectionDebounceRef.current)
+      selectionDebounceRef.current = null
+    }
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      clearSelectionDebounce()
+    }
+  }, [clearSelectionDebounce])
+
+  const normalizeSelectionForSheets = useCallback(
+    (selection: SpreadsheetRowSelection, sheets: SpreadsheetSheet[]): SpreadsheetRowSelection => {
+      const normalized: SpreadsheetRowSelection = {}
+      for (const sheet of sheets) {
+        const indices = selection[sheet.key]
+        if (!indices || indices.length === 0) continue
+        const validIndices = [...new Set(indices)]
+          .filter((index) => Number.isInteger(index) && index >= 0 && index < sheet.data.length)
+          .sort((a, b) => a - b)
+        if (validIndices.length > 0) {
+          normalized[sheet.key] = validIndices
+        }
+      }
+      return normalized
+    },
+    []
+  )
+
+  const areSelectionsEqual = useCallback(
+    (a: SpreadsheetRowSelection, b: SpreadsheetRowSelection): boolean => {
+      const aKeys = Object.keys(a).sort()
+      const bKeys = Object.keys(b).sort()
+      if (aKeys.length !== bKeys.length) return false
+      for (let i = 0; i < aKeys.length; i++) {
+        if (aKeys[i] !== bKeys[i]) return false
+        const aVals = a[aKeys[i]] || []
+        const bVals = b[bKeys[i]] || []
+        if (aVals.length !== bVals.length) return false
+        for (let j = 0; j < aVals.length; j++) {
+          if (aVals[j] !== bVals[j]) return false
+        }
+      }
+      return true
+    },
+    []
+  )
+
+  const selectedRowCount = useMemo(() => {
+    return Object.values(auditorSelection).reduce((sum, indices) => sum + indices.length, 0)
+  }, [auditorSelection])
+
+  const regenerateAuditorMarkdown = useCallback(
+    (sheets: SpreadsheetSheet[], selection: SpreadsheetRowSelection) => {
+      const markdown = convertSheetsToMarkdown(sheets, selection)
+      setAuditorMarkdown(markdown)
+      onAuditorMarkdownChange(markdown)
+    },
+    [onAuditorMarkdownChange]
+  )
 
   // AIオーディター形式Excel解析（スプレッドシート表示用）
   const handleAuditorExcelParse = useCallback(
@@ -74,12 +143,12 @@ export function RuleInputSection({
       const spreadsheetResult = await parseAuditorExcelSpreadsheet(file)
 
       if (spreadsheetResult.success) {
+        clearSelectionDebounce()
         setAuditorSheets(spreadsheetResult.sheets)
         setAuditorFilename(file.name)
+        setAuditorSelection({})
         // シートデータからマークダウンを生成
-        const markdown = convertSheetsToMarkdown(spreadsheetResult.sheets)
-        setAuditorMarkdown(markdown)
-        onAuditorMarkdownChange(markdown)
+        regenerateAuditorMarkdown(spreadsheetResult.sheets, {})
         // 親にファイル情報を通知
         onAuditorFileChange?.({
           filename: file.name,
@@ -87,14 +156,50 @@ export function RuleInputSection({
         })
       } else {
         // 失敗時はクリア
+        clearSelectionDebounce()
         setAuditorFilename('')
+        setAuditorSelection({})
         onAuditorFileChange?.(null)
       }
 
       return spreadsheetResult
     },
-    [onAuditorMarkdownChange, onAuditorFileChange]
+    [clearSelectionDebounce, onAuditorFileChange, regenerateAuditorMarkdown]
   )
+
+  const handleAuditorRowSelectionChange = useCallback(
+    (nextSelection: SpreadsheetRowSelection) => {
+      if (auditorSheets.length === 0) return
+
+      const normalizedSelection = normalizeSelectionForSheets(nextSelection, auditorSheets)
+      if (areSelectionsEqual(normalizedSelection, auditorSelection)) {
+        return
+      }
+
+      setAuditorSelection(normalizedSelection)
+      clearSelectionDebounce()
+
+      selectionDebounceRef.current = window.setTimeout(() => {
+        regenerateAuditorMarkdown(auditorSheets, normalizedSelection)
+        selectionDebounceRef.current = null
+      }, 100)
+    },
+    [
+      auditorSheets,
+      auditorSelection,
+      clearSelectionDebounce,
+      normalizeSelectionForSheets,
+      areSelectionsEqual,
+      regenerateAuditorMarkdown,
+    ]
+  )
+
+  const handleClearSelection = useCallback(() => {
+    if (auditorSheets.length === 0) return
+    clearSelectionDebounce()
+    setAuditorSelection({})
+    regenerateAuditorMarkdown(auditorSheets, {})
+  }, [auditorSheets, clearSelectionDebounce, regenerateAuditorMarkdown])
 
   // AIオーディター形式のマークダウンダウンロード
   const handleAuditorDownload = useCallback(() => {
@@ -126,6 +231,8 @@ export function RuleInputSection({
           <ExcelSpreadsheetLoader
             parseExcel={handleAuditorExcelParse}
             emptyMessage="AIオーディター形式のExcelファイルを選択してください"
+            selectedRows={auditorSelection}
+            onRowSelectionChange={handleAuditorRowSelectionChange}
           />
 
           {/* シート数と変換結果 */}
@@ -142,6 +249,19 @@ export function RuleInputSection({
                 <span className="text-sm text-gray-600">
                   {auditorSheets.length}シートをマークダウンに変換しました
                 </span>
+                <span className="text-sm text-gray-500">
+                  {selectedRowCount > 0
+                    ? `選択中: ${selectedRowCount}行（選択行のみ送信）`
+                    : '選択なし: 全行を送信'}
+                </span>
+                {selectedRowCount > 0 && (
+                  <button
+                    onClick={handleClearSelection}
+                    className="text-xs text-blue-600 hover:text-blue-800 underline underline-offset-2"
+                  >
+                    選択解除
+                  </button>
+                )}
               </div>
 
               {/* マークダウンプレビュー */}

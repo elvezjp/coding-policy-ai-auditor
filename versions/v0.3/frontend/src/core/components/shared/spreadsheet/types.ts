@@ -18,9 +18,14 @@ export interface SpreadsheetSheet {
   hyperlinks: Record<string, CellHyperlink>;  // ハイパーリンク情報 {"row,col": {sheetName, cell}}
 }
 
+/** 全シートの選択状態（シートkey -> 選択行index配列） */
+export type SpreadsheetRowSelection = Record<string, number[]>;
+
 /** SpreadsheetViewer コンポーネントのProps */
 export interface SpreadsheetViewerProps {
   sheets: SpreadsheetSheet[];
+  selectedRows?: SpreadsheetRowSelection;
+  onRowSelectionChange?: (selection: SpreadsheetRowSelection) => void;
 }
 
 /** スプレッドシート解析結果 */
@@ -36,4 +41,6 @@ export interface ExcelSpreadsheetLoaderProps {
   parseExcel: (file: File) => Promise<SpreadsheetParseResult>;
   onSheetsChange?: (sheets: SpreadsheetSheet[]) => void;
   emptyMessage?: string;
+  selectedRows?: SpreadsheetRowSelection;
+  onRowSelectionChange?: (selection: SpreadsheetRowSelection) => void;
 }

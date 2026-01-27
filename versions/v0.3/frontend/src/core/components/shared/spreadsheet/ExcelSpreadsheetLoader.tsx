@@ -12,6 +12,8 @@ export function ExcelSpreadsheetLoader({
   parseExcel,
   onSheetsChange,
   emptyMessage = 'Excelファイルを選択してください',
+  selectedRows,
+  onRowSelectionChange,
 }: ExcelSpreadsheetLoaderProps) {
   const [sheets, setSheets] = useState<SpreadsheetSheet[]>([]);
   const [filename, setFilename] = useState<string>('');
@@ -107,7 +109,13 @@ export function ExcelSpreadsheetLoader({
       )}
 
       {/* スプレッドシート表示 */}
-      {sheets.length > 0 && <SpreadsheetViewer sheets={sheets} />}
+      {sheets.length > 0 && (
+        <SpreadsheetViewer
+          sheets={sheets}
+          selectedRows={selectedRows}
+          onRowSelectionChange={onRowSelectionChange}
+        />
+      )}
 
       {/* 空状態 */}
       {sheets.length === 0 && !isLoading && !error && (

@@ -32,7 +32,7 @@ type ResultTabType = 'static-analysis' | 'audit-1' | 'audit-2'
 
 const APP_INFO = {
   name: 'coding-policy-ai-auditor',
-  version: 'v0.3.0',
+  version: 'v0.3.1',
   description: 'コーディング規約-Javaプログラム AIオーディター',
   copyright: '© 株式会社エルブズ',
   url: 'https://elvez.co.jp',

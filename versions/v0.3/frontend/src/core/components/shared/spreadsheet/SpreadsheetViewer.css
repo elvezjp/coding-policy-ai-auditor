@@ -19,3 +19,12 @@
 .cell-hyperlink:hover {
   color: #1d4ed8; /* Tailwind blue-700 */
 }
+
+/* カスタム行選択のハイライト */
+.tabulator .tabulator-row.row-selected {
+  background-color: #dbeafe; /* Tailwind blue-100 */
+}
+
+.tabulator .tabulator-row.row-selected:hover {
+  background-color: #bfdbfe; /* Tailwind blue-200 */
+}
