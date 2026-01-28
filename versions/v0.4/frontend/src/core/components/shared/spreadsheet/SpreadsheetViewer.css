@@ -42,3 +42,12 @@
 .spreadsheet-viewer[data-first-sheet="false"] .tabulator-col.tabulator-row-header input[type="checkbox"] {
   display: none;
 }
+
+/* 2シート目以降では選択ハイライトを無効化 */
+.spreadsheet-viewer[data-first-sheet="false"] .tabulator-row.tabulator-selected {
+  background-color: transparent;
+}
+
+.spreadsheet-viewer[data-first-sheet="false"] .tabulator-row.tabulator-selected:hover {
+  background-color: rgba(0, 0, 0, 0.04); /* 通常のhover色 */
+}
