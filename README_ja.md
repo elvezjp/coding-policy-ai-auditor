@@ -42,7 +42,7 @@ https://github.com/user-attachments/assets/8e52e2da-aad2-4572-acd8-396f618302b1
 ### 2. フロントエンドを起動する
 
 ```bash
-cd versions/v0.3/frontend
+cd versions/v0.4/frontend
 npm install
 npm run dev
 ```
@@ -52,7 +52,7 @@ npm run dev
 ### 3. バックエンドを起動する
 
 ```bash
-cd versions/v0.3/backend
+cd versions/v0.4/backend
 
 # 環境変数を設定
 cp .env.example .env
@@ -89,10 +89,10 @@ FRONTEND_URL=http://localhost:5173
 
 ```bash
 # フロントエンドを起動（ターミナル1）
-cd versions/v0.3/frontend && npm run dev
+cd versions/v0.4/frontend && npm run dev
 
 # バックエンドを起動（ターミナル2）
-cd versions/v0.3/backend && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+cd versions/v0.4/backend && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 # ブラウザで http://localhost:5173 にアクセス
 ```
@@ -118,10 +118,11 @@ coding-policy-ai-auditor/
 ├── docs/
 │   └── ai-auditor-format/  # AIオーディター形式サンプルファイル
 ├── versions/
-│   └── v0.3/
-│       ├── frontend/       # フロントエンドアプリケーション
-│       ├── backend/        # バックエンドアプリケーション
-│       └── spec.md         # 詳細仕様書
+│   ├── v0.4/               # 最新版（推奨）
+│   │   ├── frontend/       # フロントエンドアプリケーション
+│   │   ├── backend/        # バックエンドアプリケーション
+│   │   └── spec.md         # 詳細仕様書
+│   └── v0.3/               # 旧バージョン
 └── ...
 ```
 
