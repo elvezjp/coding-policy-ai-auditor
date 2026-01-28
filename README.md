@@ -14,7 +14,7 @@ An LLM-powered auditor that checks Java code compliance with **judgment-based co
 This tool applies coding standards "one by one" to the code, **identifies violations with specific line numbers**, and **outputs suggested fixes**.
 Since judgment-based rules are inherently difficult to determine absolutely, **ambiguous cases are reported as violations with a `Requires Review:` prefix**, designed to facilitate human review.
 
-https://github.com/user-attachments/assets/8e52e2da-aad2-4572-acd8-396f618302b1
+https://github.com/user-attachments/assets/01b8fe08-861b-473a-8f1a-f4de00f751f4
 
 ---
 
@@ -42,7 +42,7 @@ Please install the following tools in advance.
 ### 2. Start the Frontend
 
 ```bash
-cd versions/v0.3/frontend
+cd versions/v0.4/frontend
 npm install
 npm run dev
 ```
@@ -52,7 +52,7 @@ Access the web application at `http://localhost:5173` in your browser.
 ### 3. Start the Backend
 
 ```bash
-cd versions/v0.3/backend
+cd versions/v0.4/backend
 
 # Set environment variables
 cp .env.example .env
@@ -89,10 +89,10 @@ FRONTEND_URL=http://localhost:5173
 
 ```bash
 # Start frontend (Terminal 1)
-cd versions/v0.3/frontend && npm run dev
+cd versions/v0.4/frontend && npm run dev
 
 # Start backend (Terminal 2)
-cd versions/v0.3/backend && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+cd versions/v0.4/backend && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 # Access http://localhost:5173 in your browser
 ```
@@ -118,10 +118,11 @@ coding-policy-ai-auditor/
 ├── docs/
 │   └── ai-auditor-format/  # AI Auditor format sample files
 ├── versions/
-│   └── v0.3/
-│       ├── frontend/       # Frontend application
-│       ├── backend/        # Backend application
-│       └── spec.md         # Detailed specification
+│   ├── v0.4/               # Latest version (recommended)
+│   │   ├── frontend/       # Frontend application
+│   │   ├── backend/        # Backend application
+│   │   └── spec.md         # Detailed specification
+│   └── v0.3/               # Previous version
 └── ...
 ```
 
