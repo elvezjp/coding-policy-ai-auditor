@@ -233,7 +233,7 @@ wheels = [
 
 [[package]]
 name = "coding-policy-ai-auditor-backend"
-version = "0.3.0"
+version = "0.4.0"
 source = { editable = "." }
 dependencies = [
     { name = "add-line-numbers" },

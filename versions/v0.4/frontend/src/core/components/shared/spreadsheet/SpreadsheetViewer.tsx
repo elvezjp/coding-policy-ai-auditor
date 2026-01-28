@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useRef } from 'react';
-import { TabulatorFull as Tabulator, type ColumnComponent } from 'tabulator-tables';
+import { TabulatorFull as Tabulator, type ColumnComponent, type RowComponent } from 'tabulator-tables';
 import 'tabulator-tables/dist/css/tabulator_simple.min.css';
 import './SpreadsheetViewer.css';
 import type {
@@ -75,12 +75,8 @@ export function SpreadsheetViewer({
   const needsRedrawAfterSheetLoadRef = useRef<boolean>(false);
   // 選択状態（シートkey -> 行index配列）を保持
   const selectionRef = useRef<SpreadsheetRowSelection>({});
-  // Shift+クリック用にシートごとの最後のクリック行を保持
-  const lastClickedRowRef = useRef<Record<string, number | null>>({});
   // 選択復元中は通知を抑制する（無限ループ防止）
   const isRestoringSelectionRef = useRef<boolean>(false);
-  // ハイパーリンククリック直後のrowClickをスキップする
-  const skipNextRowClickRef = useRef<boolean>(false);
   // 復元用の関数参照（props変更時に利用）
   const restoreSelectionRef = useRef<() => void>(() => {});
   // コールバックの最新参照を保持（useEffectの依存配列に入れずにstale closureを防止）
@@ -99,7 +95,6 @@ export function SpreadsheetViewer({
     // sheetsをMapに変換して保持
     sheetsMapRef.current = new Map(sheets.map((s) => [s.key, s]));
     selectionRef.current = normalizeSelection(selectedRows, sheetsMapRef.current);
-    lastClickedRowRef.current = {};
 
     // 初期シートのキーを設定
     if (sheets.length > 0) {
@@ -170,12 +165,15 @@ export function SpreadsheetViewer({
         minWidth: 150, // 最小列幅を設定
       },
       height: 'max(200px, calc(100vh - 400px))',
+      selectableRows: true,
       rowHeader: {
+        formatter: 'rowSelection',
+        titleFormatter: 'rowSelection',
+        headerSort: false,
         resizable: false,
         frozen: true,
         width: 40,
         hozAlign: 'center',
-        formatter: 'rownum',
       },
     } as any);
 
@@ -189,33 +187,55 @@ export function SpreadsheetViewer({
       onRowSelectionChangeRef.current(buildSelectionPayload());
     };
 
-    const applyRowHighlighting = () => {
+    // Tabulatorの選択状態をselectionRefに同期
+    const syncSelectionFromTabulator = () => {
+      if (!tabulatorRef.current) return;
+      const sheetKey = currentSheetKeyRef.current;
+      const selectedRowComponents = tabulatorRef.current.getSelectedRows();
+      const indices = selectedRowComponents
+        .map((row: RowComponent) => {
+          const pos = row.getPosition();
+          return pos !== false ? pos - 1 : -1; // 0-based
+        })
+        .filter((idx: number) => idx >= 0)
+        .sort((a: number, b: number) => a - b);
+      selectionRef.current = {
+        ...selectionRef.current,
+        [sheetKey]: indices,
+      };
+    };
+
+    // selectionRefからTabulatorの選択状態を復元
+    const restoreSelectionToTabulator = () => {
       if (!tabulatorRef.current) return;
       const sheetKey = currentSheetKeyRef.current;
       const sheet = sheetsMapRef.current.get(sheetKey);
       if (!sheet) return;
 
-      const selectedSet = new Set(
-        normalizeRowIndices(selectionRef.current[sheetKey], sheet.data.length)
-      );
+      const selectedIndices = selectionRef.current[sheetKey] || [];
+      const rows = tabulatorRef.current.getRows();
 
-      tabulatorRef.current.getRows().forEach((row) => {
-        const pos = row.getPosition();
-        if (pos === false) return;
-        const rowIndex = pos - 1; // 0-based
-        const rowElement = row.getElement();
-        if (!rowElement) return;
-        if (selectedSet.has(rowIndex)) {
-          rowElement.classList.add('row-selected');
-        } else {
-          rowElement.classList.remove('row-selected');
-        }
-      });
+      // 一旦全解除
+      tabulatorRef.current.deselectRow();
+
+      if (selectedIndices.length === 0) {
+        // 選択がない場合は全行選択（初期状態）
+        tabulatorRef.current.selectRow();
+      } else {
+        // 指定行を選択
+        const selectedSet = new Set(selectedIndices);
+        rows.forEach((row: RowComponent) => {
+          const pos = row.getPosition();
+          if (pos !== false && selectedSet.has(pos - 1)) {
+            tabulatorRef.current?.selectRow(row);
+          }
+        });
+      }
     };
 
     const restoreSelectionForCurrentSheet = () => {
       isRestoringSelectionRef.current = true;
-      applyRowHighlighting();
+      restoreSelectionToTabulator();
       isRestoringSelectionRef.current = false;
     };
     restoreSelectionRef.current = restoreSelectionForCurrentSheet;
@@ -278,8 +298,6 @@ export function SpreadsheetViewer({
 
         const hyperlink = hasHyperlink(rowIndex, colIndex);
         if (hyperlink) {
-          // ハイパーリンク遷移時はrowClickでの選択を抑制
-          skipNextRowClickRef.current = true;
           // リンク先シートのキーを取得
           const targetSheetKey = makeSheetKey(hyperlink.sheetName);
           // シート切り替え
@@ -287,59 +305,27 @@ export function SpreadsheetViewer({
         }
       });
 
-      // 行クリックで複数選択／範囲選択を実装（スプレッドシートモードのためカスタム実装）
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      tabulatorRef.current?.on('rowClick', (e: UIEvent, row: any) => {
-        if (skipNextRowClickRef.current) {
-          skipNextRowClickRef.current = false;
-          return;
-        }
-
-        const sheetKey = currentSheetKeyRef.current;
-        const sheet = sheetsMapRef.current.get(sheetKey);
-        if (!sheet) return;
-
-        const maxRows = sheet.data.length;
-        const pos = row.getPosition();
-        if (pos === false) return;
-        const clickedRowIndex = pos - 1; // 0-based
-        if (clickedRowIndex < 0 || clickedRowIndex >= maxRows) return;
-
-        const currentSelection = new Set(
-          normalizeRowIndices(selectionRef.current[sheetKey], maxRows)
-        );
-
-        const lastClickedRow = lastClickedRowRef.current[sheetKey];
-
-        // Shift+クリックで範囲選択、通常クリックでトグル
-        const mouseEvent = e as MouseEvent;
-        if (mouseEvent.shiftKey && lastClickedRow !== null && lastClickedRow !== undefined) {
-          const start = Math.min(lastClickedRow, clickedRowIndex);
-          const end = Math.max(lastClickedRow, clickedRowIndex);
-          for (let i = start; i <= end; i++) {
-            currentSelection.add(i);
-          }
-        } else {
-          if (currentSelection.has(clickedRowIndex)) {
-            currentSelection.delete(clickedRowIndex);
-          } else {
-            currentSelection.add(clickedRowIndex);
-          }
-        }
-
-        const nextIndices = [...currentSelection].sort((a, b) => a - b);
-        selectionRef.current = {
-          ...selectionRef.current,
-          [sheetKey]: nextIndices,
-        };
-        lastClickedRowRef.current[sheetKey] = clickedRowIndex;
-
-        applyRowHighlighting();
+      // 行選択変更イベントで選択状態を同期して親に通知
+      tabulatorRef.current?.on('rowSelectionChanged', () => {
+        syncSelectionFromTabulator();
         notifySelectionChange();
       });
 
-      // 初回表示時にも選択状態を反映
-      restoreSelectionForCurrentSheet();
+      // 初回表示時に全行選択（selectedRowsが空の場合）
+      const sheetKey = currentSheetKeyRef.current;
+      const initialSelection = selectionRef.current[sheetKey];
+      if (!initialSelection || initialSelection.length === 0) {
+        // 全行選択
+        isRestoringSelectionRef.current = true;
+        tabulatorRef.current?.selectRow();
+        syncSelectionFromTabulator();
+        isRestoringSelectionRef.current = false;
+        // 初期全選択を親に通知
+        notifySelectionChange();
+      } else {
+        // 指定された選択状態を復元
+        restoreSelectionForCurrentSheet();
+      }
     });
 
     return () => {
@@ -361,17 +347,6 @@ export function SpreadsheetViewer({
       return;
     }
     selectionRef.current = normalizedIncoming;
-    // 親から選択がクリアされた場合、Shift+クリックの基準行もリセットする
-    for (const sheetKey of sheetsMapRef.current.keys()) {
-      const incomingIndices = normalizedIncoming[sheetKey];
-      if (!incomingIndices || incomingIndices.length === 0) {
-        lastClickedRowRef.current[sheetKey] = null;
-      } else {
-        // 選択がある場合は末尾を基準行として保持しておく
-        const lastIndex = incomingIndices[incomingIndices.length - 1];
-        lastClickedRowRef.current[sheetKey] = typeof lastIndex === 'number' ? lastIndex : null;
-      }
-    }
     if (!tabulatorRef.current) return;
     isRestoringSelectionRef.current = true;
     restoreSelectionRef.current();
