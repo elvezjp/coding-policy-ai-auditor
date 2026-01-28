@@ -28,3 +28,17 @@
 .tabulator .tabulator-row.tabulator-selected:hover {
   background-color: #bfdbfe; /* Tailwind blue-200 */
 }
+
+/* 2シート目以降ではチェックボックスを非表示・無効化 */
+.spreadsheet-viewer[data-first-sheet="false"] .tabulator-row .tabulator-row-header {
+  pointer-events: none;
+}
+
+.spreadsheet-viewer[data-first-sheet="false"] .tabulator-row .tabulator-row-header input[type="checkbox"] {
+  display: none;
+}
+
+/* 2シート目以降ではヘッダーの全選択チェックボックスも非表示 */
+.spreadsheet-viewer[data-first-sheet="false"] .tabulator-col.tabulator-row-header input[type="checkbox"] {
+  display: none;
+}

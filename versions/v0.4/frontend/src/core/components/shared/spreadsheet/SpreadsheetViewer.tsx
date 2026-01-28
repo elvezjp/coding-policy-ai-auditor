@@ -5,7 +5,7 @@
  * 選択機能は1シート目のみで有効。2シート目以降は選択不可。
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { TabulatorFull as Tabulator, type ColumnComponent, type RowComponent } from 'tabulator-tables';
 import 'tabulator-tables/dist/css/tabulator_simple.min.css';
 import './SpreadsheetViewer.css';
@@ -45,6 +45,9 @@ export function SpreadsheetViewer({
 }: SpreadsheetViewerProps) {
   const tableRef = useRef<HTMLDivElement>(null);
   const tabulatorRef = useRef<Tabulator | null>(null);
+
+  // 現在1シート目を表示中かどうか（CSSでチェックボックス表示を制御）
+  const [isFirstSheet, setIsFirstSheet] = useState(true);
 
   // sheets を key でアクセスできるMapとして保持
   const sheetsMapRef = useRef<Map<string, SpreadsheetSheet>>(new Map());
@@ -279,6 +282,8 @@ export function SpreadsheetViewer({
           needsRedrawAfterSheetLoadRef.current = false;
           isSheetSwitchingRef.current = false;
           adjustColumnWidths();
+          // 1シート目かどうかを更新（CSSでチェックボックス表示を制御）
+          setIsFirstSheet(currentSheetKeyRef.current === firstSheetKey);
           // シート切り替え後の選択復元
           applySelectionWithGuard(
             currentSheetKeyRef.current === firstSheetKey
@@ -431,5 +436,11 @@ export function SpreadsheetViewer({
     }
   }, [selectedRows, sheets]);
 
-  return <div ref={tableRef} />;
+  return (
+    <div
+      ref={tableRef}
+      className="spreadsheet-viewer"
+      data-first-sheet={isFirstSheet ? 'true' : 'false'}
+    />
+  );
 }
