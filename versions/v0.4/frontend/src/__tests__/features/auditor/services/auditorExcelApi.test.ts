@@ -6,14 +6,15 @@ describe('convertSheetsToMarkdown', () => {
   const createMockSheet = (
     title: string,
     key: string,
-    data: string[][]
+    data: string[][],
+    hyperlinks: Record<string, { sheetName: string; cell: string }> = {}
   ): SpreadsheetSheet => ({
     title,
     key,
     data,
     rows: data.length,
     columns: data[0]?.length || 0,
-    hyperlinks: {},
+    hyperlinks,
   })
 
   describe('基本機能', () => {
@@ -37,7 +38,7 @@ describe('convertSheetsToMarkdown', () => {
       expect(result).toContain('A3\tB3\tC3')
     })
 
-    it('複数シートの場合、すべてのシートが含まれる', () => {
+    it('複数シートでリンクがない場合、1シート目のみ含まれる', () => {
       const sheets: SpreadsheetSheet[] = [
         createMockSheet('Sheet1', 'Sheet1', [['A1', 'B1']]),
         createMockSheet('Sheet2', 'Sheet2', [['A2', 'B2']]),
@@ -45,14 +46,29 @@ describe('convertSheetsToMarkdown', () => {
 
       const result = convertSheetsToMarkdown(sheets)
       expect(result).toContain('## Sheet1')
-      expect(result).toContain('## Sheet2')
+      expect(result).not.toContain('## Sheet2')
       expect(result).toContain('A1\tB1')
-      expect(result).toContain('A2\tB2')
+      expect(result).not.toContain('A2\tB2')
+    })
+
+    it('複数シートでリンクがある場合、リンク先シートも含まれる', () => {
+      const sheets: SpreadsheetSheet[] = [
+        createMockSheet('規約一覧', 'Sheet1', [['規約1', '詳細']], {
+          '0,1': { sheetName: '詳細シート', cell: 'A1' },
+        }),
+        createMockSheet('詳細シート', 'Sheet2', [['詳細内容', '説明']]),
+      ]
+
+      const result = convertSheetsToMarkdown(sheets)
+      expect(result).toContain('## 規約一覧')
+      expect(result).toContain('## 詳細シート')
+      expect(result).toContain('規約1\t詳細')
+      expect(result).toContain('詳細内容\t説明')
     })
   })
 
-  describe('選択行フィルタ', () => {
-    it('選択がない場合は全行を含む', () => {
+  describe('1シート目の選択行フィルタ', () => {
+    it('選択がない場合は1シート目の全行を含む', () => {
       const sheets: SpreadsheetSheet[] = [
         createMockSheet('Sheet1', 'Sheet1', [
           ['A1', 'B1'],
@@ -67,7 +83,7 @@ describe('convertSheetsToMarkdown', () => {
       expect(result).toContain('A3\tB3')
     })
 
-    it('選択行がある場合、選択行のみを含む', () => {
+    it('選択行がある場合、1シート目の選択行のみを含む', () => {
       const sheets: SpreadsheetSheet[] = [
         createMockSheet('Sheet1', 'Sheet1', [
           ['A1', 'B1'],
@@ -84,34 +100,6 @@ describe('convertSheetsToMarkdown', () => {
       expect(result).toContain('A1\tB1')
       expect(result).not.toContain('A2\tB2')
       expect(result).toContain('A3\tB3')
-    })
-
-    it('複数シートで選択がある場合、各シートの選択行のみを含む', () => {
-      const sheets: SpreadsheetSheet[] = [
-        createMockSheet('Sheet1', 'Sheet1', [
-          ['A1', 'B1'],
-          ['A2', 'B2'],
-        ]),
-        createMockSheet('Sheet2', 'Sheet2', [
-          ['C1', 'D1'],
-          ['C2', 'D2'],
-          ['C3', 'D3'],
-        ]),
-      ]
-
-      const selection: SpreadsheetRowSelection = {
-        Sheet1: [0], // Sheet1の1行目のみ
-        Sheet2: [1, 2], // Sheet2の2行目と3行目
-      }
-
-      const result = convertSheetsToMarkdown(sheets, selection)
-      // Sheet1
-      expect(result).toContain('A1\tB1')
-      expect(result).not.toContain('A2\tB2')
-      // Sheet2
-      expect(result).not.toContain('C1\tD1')
-      expect(result).toContain('C2\tD2')
-      expect(result).toContain('C3\tD3')
     })
 
     it('選択行が重複している場合、一意化される', () => {
@@ -159,6 +147,108 @@ describe('convertSheetsToMarkdown', () => {
     })
   })
 
+  describe('2シート目以降のリンクベースフィルタ', () => {
+    it('選択行からリンクされているシートのみ含まれる', () => {
+      const sheets: SpreadsheetSheet[] = [
+        createMockSheet(
+          '規約一覧',
+          'Sheet1',
+          [
+            ['規約1', '詳細A'],
+            ['規約2', '詳細B'],
+            ['規約3', '詳細C'],
+          ],
+          {
+            '0,1': { sheetName: '詳細シートA', cell: 'A1' },
+            '1,1': { sheetName: '詳細シートB', cell: 'A1' },
+            '2,1': { sheetName: '詳細シートC', cell: 'A1' },
+          }
+        ),
+        createMockSheet('詳細シートA', 'Sheet2', [['詳細A内容']]),
+        createMockSheet('詳細シートB', 'Sheet3', [['詳細B内容']]),
+        createMockSheet('詳細シートC', 'Sheet4', [['詳細C内容']]),
+      ]
+
+      const selection: SpreadsheetRowSelection = {
+        Sheet1: [0, 2], // 規約1と規約3を選択（詳細シートAとCにリンク）
+      }
+
+      const result = convertSheetsToMarkdown(sheets, selection)
+      expect(result).toContain('## 規約一覧')
+      expect(result).toContain('## 詳細シートA')
+      expect(result).not.toContain('## 詳細シートB') // 規約2は選択されていない
+      expect(result).toContain('## 詳細シートC')
+      expect(result).toContain('詳細A内容')
+      expect(result).not.toContain('詳細B内容')
+      expect(result).toContain('詳細C内容')
+    })
+
+    it('複数の規約が同一シートにリンクしている場合、いずれか選択されていれば含まれる', () => {
+      const sheets: SpreadsheetSheet[] = [
+        createMockSheet(
+          '規約一覧',
+          'Sheet1',
+          [
+            ['規約1', '詳細'],
+            ['規約2', '詳細'],
+            ['規約3', '詳細'],
+          ],
+          {
+            '0,1': { sheetName: '共通詳細シート', cell: 'A1' },
+            '1,1': { sheetName: '共通詳細シート', cell: 'A1' },
+            '2,1': { sheetName: '共通詳細シート', cell: 'A1' },
+          }
+        ),
+        createMockSheet('共通詳細シート', 'Sheet2', [['共通詳細内容']]),
+      ]
+
+      const selection: SpreadsheetRowSelection = {
+        Sheet1: [1], // 規約2のみ選択
+      }
+
+      const result = convertSheetsToMarkdown(sheets, selection)
+      expect(result).toContain('## 共通詳細シート')
+      expect(result).toContain('共通詳細内容')
+    })
+
+    it('選択がない場合、全リンク先シートが含まれる', () => {
+      const sheets: SpreadsheetSheet[] = [
+        createMockSheet(
+          '規約一覧',
+          'Sheet1',
+          [
+            ['規約1', '詳細A'],
+            ['規約2', '詳細B'],
+          ],
+          {
+            '0,1': { sheetName: '詳細シートA', cell: 'A1' },
+            '1,1': { sheetName: '詳細シートB', cell: 'A1' },
+          }
+        ),
+        createMockSheet('詳細シートA', 'Sheet2', [['詳細A内容']]),
+        createMockSheet('詳細シートB', 'Sheet3', [['詳細B内容']]),
+      ]
+
+      const result = convertSheetsToMarkdown(sheets, {})
+      expect(result).toContain('## 詳細シートA')
+      expect(result).toContain('## 詳細シートB')
+    })
+
+    it('リンクがないシートは2シート目以降に含まれない', () => {
+      const sheets: SpreadsheetSheet[] = [
+        createMockSheet('規約一覧', 'Sheet1', [['規約1', '詳細']], {
+          '0,1': { sheetName: '詳細シートA', cell: 'A1' },
+        }),
+        createMockSheet('詳細シートA', 'Sheet2', [['詳細A内容']]),
+        createMockSheet('未リンクシート', 'Sheet3', [['未リンク内容']]),
+      ]
+
+      const result = convertSheetsToMarkdown(sheets)
+      expect(result).toContain('## 詳細シートA')
+      expect(result).not.toContain('## 未リンクシート')
+    })
+  })
+
   describe('エッジケース', () => {
     it('存在しない行インデックスは無視される', () => {
       const sheets: SpreadsheetSheet[] = [
@@ -195,9 +285,7 @@ describe('convertSheetsToMarkdown', () => {
     })
 
     it('空のシート（0行）で選択操作してもエラーが発生しない', () => {
-      const sheets: SpreadsheetSheet[] = [
-        createMockSheet('Sheet1', 'Sheet1', []),
-      ]
+      const sheets: SpreadsheetSheet[] = [createMockSheet('Sheet1', 'Sheet1', [])]
 
       const selection: SpreadsheetRowSelection = {
         Sheet1: [0],
@@ -209,9 +297,7 @@ describe('convertSheetsToMarkdown', () => {
     })
 
     it('1行のみのシートで選択・解除が正常に動作', () => {
-      const sheets: SpreadsheetSheet[] = [
-        createMockSheet('Sheet1', 'Sheet1', [['A1', 'B1']]),
-      ]
+      const sheets: SpreadsheetSheet[] = [createMockSheet('Sheet1', 'Sheet1', [['A1', 'B1']])]
 
       const selection: SpreadsheetRowSelection = {
         Sheet1: [0],
@@ -225,9 +311,7 @@ describe('convertSheetsToMarkdown', () => {
     })
 
     it('存在しないシートキーの選択は無視される', () => {
-      const sheets: SpreadsheetSheet[] = [
-        createMockSheet('Sheet1', 'Sheet1', [['A1', 'B1']]),
-      ]
+      const sheets: SpreadsheetSheet[] = [createMockSheet('Sheet1', 'Sheet1', [['A1', 'B1']])]
 
       const selection: SpreadsheetRowSelection = {
         NonExistentSheet: [0],
@@ -253,6 +337,23 @@ describe('convertSheetsToMarkdown', () => {
       const lines = result.split('\n')
       const emptyLineCount = lines.filter((line) => line.trim() === '').length
       expect(emptyLineCount).toBeLessThanOrEqual(3) // 見出しの空行のみ
+    })
+
+    it('ハイパーリンクがないシートでも正常に動作', () => {
+      const sheets: SpreadsheetSheet[] = [
+        {
+          title: 'Sheet1',
+          key: 'Sheet1',
+          data: [['A1', 'B1']],
+          rows: 1,
+          columns: 2,
+          hyperlinks: {},
+        },
+      ]
+
+      const result = convertSheetsToMarkdown(sheets)
+      expect(result).toContain('## Sheet1')
+      expect(result).toContain('A1\tB1')
     })
   })
 })
