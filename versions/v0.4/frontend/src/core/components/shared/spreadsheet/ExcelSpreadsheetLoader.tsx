@@ -108,6 +108,14 @@ export function ExcelSpreadsheetLoader({
         </div>
       )}
 
+      {/* ファイル選択後の注意書き */}
+      {sheets.length > 0 && (
+        <div className="text-xs text-gray-400">
+          <p>※ 1シート目で選択したコーディング規約がマークダウンに変換されます。</p>
+          <p>※ 2シート目以降は、選択した行からリンクされたシートが自動的に追加されます。</p>
+        </div>
+      )}
+
       {/* スプレッドシート表示 */}
       {sheets.length > 0 && (
         <SpreadsheetViewer

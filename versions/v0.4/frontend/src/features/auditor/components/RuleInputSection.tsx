@@ -288,9 +288,6 @@ export function RuleInputSection({
             </div>
           )}
 
-          <p className="text-xs text-gray-400 mt-2">
-            ※ AIオーディター形式のExcelファイルを読み込み、全シートをマークダウン形式に変換します。
-          </p>
         </div>
       )}
 
