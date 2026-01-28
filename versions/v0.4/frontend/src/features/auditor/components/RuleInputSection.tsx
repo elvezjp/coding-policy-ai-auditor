@@ -3,7 +3,7 @@
  * AIオーディター形式とExcelマークダウン変換をタブで切り替え
  */
 
-import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { Download, ChevronDown, ChevronRight } from 'lucide-react'
 import { Tabs, ExcelSpreadsheetLoader } from '@core/index'
 import type {
@@ -123,10 +123,6 @@ export function RuleInputSection({
     []
   )
 
-  const selectedRowCount = useMemo(() => {
-    return Object.values(auditorSelection).reduce((sum, indices) => sum + indices.length, 0)
-  }, [auditorSelection])
-
   const regenerateAuditorMarkdown = useCallback(
     (sheets: SpreadsheetSheet[], selection: SpreadsheetRowSelection) => {
       const markdown = convertSheetsToMarkdown(sheets, selection)
@@ -194,13 +190,6 @@ export function RuleInputSection({
     ]
   )
 
-  const handleClearSelection = useCallback(() => {
-    if (auditorSheets.length === 0) return
-    clearSelectionDebounce()
-    setAuditorSelection({})
-    regenerateAuditorMarkdown(auditorSheets, {})
-  }, [auditorSheets, clearSelectionDebounce, regenerateAuditorMarkdown])
-
   // AIオーディター形式のマークダウンダウンロード
   const handleAuditorDownload = useCallback(() => {
     if (!auditorMarkdown) return
@@ -235,7 +224,7 @@ export function RuleInputSection({
             onRowSelectionChange={handleAuditorRowSelectionChange}
           />
 
-          {/* シート数と変換結果 */}
+          {/* マークダウンプレビューとダウンロード */}
           {auditorSheets.length > 0 && (
             <div className="mt-4">
               <div className="flex items-center gap-2 mb-2">
@@ -246,22 +235,6 @@ export function RuleInputSection({
                   <Download className="w-4 h-4 inline mr-1" />
                   ダウンロード
                 </button>
-                <span className="text-sm text-gray-600">
-                  {auditorSheets.length}シートをマークダウンに変換しました
-                </span>
-                <span className="text-sm text-gray-500">
-                  {selectedRowCount > 0
-                    ? `選択中: ${selectedRowCount}行（選択行のみ送信）`
-                    : '選択なし: 全行を送信'}
-                </span>
-                {selectedRowCount > 0 && (
-                  <button
-                    onClick={handleClearSelection}
-                    className="text-xs text-blue-600 hover:text-blue-800 underline underline-offset-2"
-                  >
-                    選択解除
-                  </button>
-                )}
               </div>
 
               {/* マークダウンプレビュー */}
