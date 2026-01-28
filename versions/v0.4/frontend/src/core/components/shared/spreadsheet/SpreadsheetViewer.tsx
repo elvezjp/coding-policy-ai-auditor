@@ -161,7 +161,7 @@ export function SpreadsheetViewer({
         resizable: 'header',
         minWidth: 150,
       },
-      height: 'max(200px, calc(100vh - 400px))',
+      height: 'max(200px, 60vh)',
       selectableRows: true,
       rowHeader: {
         formatter: 'rowSelection',
