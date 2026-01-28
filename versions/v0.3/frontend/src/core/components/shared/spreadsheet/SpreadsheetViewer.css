@@ -1,0 +1,21 @@
+/**
+ * SpreadsheetViewer用カスタムスタイル
+ * tabulator_simpleテーマのオーバーライド
+ */
+
+/* アクティブタブの色を赤から青に変更 */
+.tabulator .tabulator-footer .tabulator-spreadsheet-tabs .tabulator-spreadsheet-tab.tabulator-spreadsheet-tab-active {
+  color: #2563eb; /* Tailwind blue-600 */
+  font-weight: bold;
+}
+
+/* ハイパーリンクセルのスタイル */
+.cell-hyperlink {
+  color: #2563eb; /* Tailwind blue-600 */
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.cell-hyperlink:hover {
+  color: #1d4ed8; /* Tailwind blue-700 */
+}
