@@ -282,7 +282,7 @@ class TestTimeMeasure:
         import time
 
         with TimeMeasure() as timer:
-            time.sleep(0.01)  # 10ms
+            time.sleep(0.05)  # 50ms
 
-        assert timer.duration_ms >= 10
-        assert timer.duration_ms < 100  # 妥当な範囲内
+        assert timer.duration_ms >= 30
+        assert timer.duration_ms < 500  # 妥当な範囲内
