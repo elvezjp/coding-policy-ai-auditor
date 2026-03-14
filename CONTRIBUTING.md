@@ -72,7 +72,7 @@
 
 ### 前提条件
 
-- Python 3.10 以上
+- Python 3.11 以上
 - Node.js 20.0.0 以上
 - [uv](https://docs.astral.sh/uv/) パッケージマネージャー
 - AWS アカウント（Bedrock へのアクセス権限）

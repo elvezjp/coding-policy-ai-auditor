@@ -2,7 +2,7 @@
 name = "coding-policy-ai-auditor-backend"
 version = "0.4.0"
 description = "コーディング規約-Javaプログラム AIオーディター バックエンド"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.115.0",
     "uvicorn[standard]>=0.32.0",
