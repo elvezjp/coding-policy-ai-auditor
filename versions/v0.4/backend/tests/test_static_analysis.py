@@ -274,6 +274,109 @@ class TestSeverityMapping:
         assert map_pylint_severity("unknown") == "warning"
 
 
+class TestProcUtils:
+    """utils/proc.py のテスト"""
+
+    def test_resolve_cmd_on_windows_wraps_bat(self):
+        """Windows 環境で .bat は cmd /c でラップされること"""
+        from unittest.mock import patch
+        from app.services.static_analysis.utils.proc import resolve_cmd_on_windows
+
+        with patch("app.services.static_analysis.utils.proc.sys") as mock_sys, \
+             patch("app.services.static_analysis.utils.proc.shutil.which",
+                   return_value=r"C:\tools\checkstyle.bat"):
+            mock_sys.platform = "win32"
+            result = resolve_cmd_on_windows(["checkstyle", "--version"])
+
+        assert result == ["cmd", "/c", r"C:\tools\checkstyle.bat", "--version"]
+
+    def test_resolve_cmd_on_non_windows_passthrough(self):
+        """Windows 以外ではコマンドがそのまま返ること"""
+        from app.services.static_analysis.utils.proc import resolve_cmd_on_windows
+
+        result = resolve_cmd_on_windows(["checkstyle", "--version"])
+        assert result == ["checkstyle", "--version"]
+
+    def test_decode_with_fallback_utf8(self):
+        """UTF-8 バイト列は正常にデコードできること"""
+        from app.services.static_analysis.utils.proc import decode_with_fallback
+
+        result = decode_with_fallback("hello".encode("utf-8"))
+        assert result == "hello"
+
+    def test_decode_with_fallback_cp932(self):
+        """CP932 バイト列が UTF-8 としてデコード失敗した後 CP932 で読めること"""
+        from app.services.static_analysis.utils.proc import decode_with_fallback
+
+        cp932_bytes = "日本語テスト".encode("cp932")
+        result = decode_with_fallback(cp932_bytes)
+        assert result == "日本語テスト"
+
+
+class TestCreateTempFiles:
+    """base.py _create_temp_files のテスト"""
+
+    def test_cp932_file_converted_to_utf8(self, tmp_path):
+        """path 指定の CP932 ファイルが UTF-8 に変換されて配置されること"""
+        from app.services.static_analysis.tools.checkstyle import CheckstyleRunner
+
+        # CP932 でエンコードされたファイルを用意
+        src = tmp_path / "source" / "Main.java"
+        src.parent.mkdir()
+        src.write_bytes("// 日本語コメント\nclass Main {}".encode("cp932"))
+
+        out_dir = tmp_path / "out"
+        out_dir.mkdir()
+
+        runner = CheckstyleRunner()
+        runner._create_temp_files(
+            [{"name": "Main.java", "path": str(src)}],
+            str(out_dir),
+        )
+
+        result = (out_dir / "Main.java").read_text(encoding="utf-8")
+        assert "日本語コメント" in result
+
+
+class TestCheckstyleRunner:
+    """CheckstyleRunnerのテスト"""
+
+    def test_run_no_java_files_returns_empty_violations(self):
+        """.javaファイルが0件の場合、空のviolationsで正常終了すること"""
+        from app.services.static_analysis.tools.checkstyle import CheckstyleRunner
+
+        runner = CheckstyleRunner()
+        # .javaファイルを含まないファイルリストを渡す
+        result = runner.run(
+            files=[{"name": "README.md", "content": "# test"}],
+            config_file=None,
+        )
+
+        assert result["status"] == "executed"
+        assert result["violations"] == []
+        assert result["exit_code"] == 0
+
+    def test_run_missing_config_returns_skipped(self):
+        """バンドルconfigが存在しない場合、skipped_config_missingが返ること"""
+        from pathlib import Path
+        from unittest.mock import patch
+        from app.services.static_analysis.tools.checkstyle import CheckstyleRunner
+
+        runner = CheckstyleRunner()
+        with patch.object(
+            runner,
+            "_get_bundled_config",
+            return_value=Path("/nonexistent/path/checkstyle.xml"),
+        ):
+            result = runner.run(
+                files=[{"name": "Main.java", "content": "class Main {}"}],
+                config_file=None,
+            )
+
+        assert result["status"] == "skipped_config_missing"
+        assert result["violations"] == []
+
+
 class TestTimeMeasure:
     """TimeMeasureのテスト"""
 
