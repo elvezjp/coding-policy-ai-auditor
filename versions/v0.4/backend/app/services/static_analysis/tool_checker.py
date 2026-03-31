@@ -167,11 +167,11 @@ class ToolChecker:
         return result
 
     def check_installed(self, tool_name: str) -> bool:
-        """指定ツールがインストールされているか確認（後方互換性用）"""
+        """指定ツールがインストールされているか確認"""
         return self.get_tool_availability(tool_name)["available"]
 
     def get_version(self, tool_name: str) -> str | None:
-        """ツールのバージョンを取得（後方互換性用）"""
+        """ツールのバージョンを取得"""
         return self.get_tool_availability(tool_name)["version"]
 
     def get_tools_availability(self) -> dict[str, Any]:
