@@ -1,5 +1,6 @@
 """ツール実行の基底クラスと共通ユーティリティ"""
 
+import shutil
 import time
 from abc import ABC, abstractmethod
 from pathlib import Path
@@ -51,7 +52,30 @@ class ToolRunner(ABC):
             relative_path = self._safe_relative_path(file_data)
             target_path = Path(tmpdir) / relative_path
             target_path.parent.mkdir(parents=True, exist_ok=True)
-            target_path.write_text(file_data.get("content", ""))
+
+            src_path = file_data.get("path")
+            if src_path:
+                # まずは非破壊でコピー（UTF-8ならこのままでOK）
+                shutil.copy2(src_path, target_path)
+                try:
+                    target_path.read_text(encoding="utf-8")
+                except UnicodeDecodeError:
+                    # CP932（Shift_JIS）の可能性が高いのでUTF-8に変換して書き戻す
+                    txt = target_path.read_text(encoding="cp932")
+                    target_path.write_text(txt, encoding="utf-8")
+                continue
+
+            if "content" in file_data:
+                data = file_data["content"]
+                if isinstance(data, (bytes, bytearray)):
+                    target_path.write_bytes(data)
+                elif isinstance(data, str):
+                    enc = file_data.get("encoding", "utf-8")
+                    target_path.write_text(data, encoding=enc, newline="\n")
+                else:
+                    raise TypeError("content must be bytes or str")
+            else:
+                raise ValueError("file spec must contain 'path' or 'content'")
 
     def _safe_relative_path(self, file_data: dict[str, str]) -> Path:
         """パストラバーサル攻撃を防止した相対パスを取得"""

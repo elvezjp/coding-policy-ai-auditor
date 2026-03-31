@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from ..base import ToolRunner
+from ..utils.proc import run_capture
 
 logger = logging.getLogger(__name__)
 
@@ -64,14 +65,9 @@ class PMDRunner(ToolRunner):
 
             try:
                 with self._measure_time() as timer:
-                    result = subprocess.run(
-                        command,
-                        capture_output=True,
-                        text=True,
-                        timeout=self.timeout,
-                    )
+                    ret, out, err = run_capture(command, timeout=self.timeout)
 
-                violations = []
+                violations: list[dict[str, Any]] = []
                 # PMDは違反がある場合exit code 4を返す
                 if output_file.exists():
                     violations = self._parse_xml(output_file)
@@ -80,7 +76,7 @@ class PMDRunner(ToolRunner):
                     "executed",
                     violations,
                     config_used=config_used,
-                    exit_code=result.returncode,
+                    exit_code=ret,
                     duration_ms=timer.duration_ms,
                     version=self._get_version(),
                 )
@@ -107,13 +103,8 @@ class PMDRunner(ToolRunner):
         "PMD X.Y.Z" 形式の行を探して抽出する。
         """
         try:
-            result = subprocess.run(
-                ["pmd", "--version"],
-                capture_output=True,
-                text=True,
-                timeout=5,
-            )
-            output = (result.stdout or result.stderr or "").strip()
+            ret, out, err = run_capture(["pmd", "--version"], timeout=5)
+            output = (out or err or "").strip()
             if not output:
                 return None
 

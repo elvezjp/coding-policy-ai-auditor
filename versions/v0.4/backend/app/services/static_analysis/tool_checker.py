@@ -6,6 +6,8 @@ import subprocess
 import sys
 from typing import Any
 
+from .utils.proc import run_capture
+
 logger = logging.getLogger(__name__)
 
 
@@ -58,15 +60,10 @@ class ToolChecker:
             return self._java_runtime_cache
 
         try:
-            result = subprocess.run(
-                ["java", "-version"],
-                capture_output=True,
-                text=True,
-                timeout=5,
-            )
-            if result.returncode == 0:
-                # java -versionはstderrに出力される
-                output = (result.stderr or result.stdout or "").strip()
+            ret, out, err = run_capture(["java", "-version"], timeout=5)
+            if ret == 0 or out or err:
+                # java -version はstderrに出力される実装が多い
+                output = (err or out or "").strip()
                 java_version = self._extract_java_version(output)
                 self._java_runtime_cache = (True, None, java_version)
             else:
@@ -141,14 +138,9 @@ class ToolChecker:
 
         # ツール自体の確認
         try:
-            proc_result = subprocess.run(
-                tool_config["command"],
-                capture_output=True,
-                text=True,
-                timeout=5,
-            )
-            if proc_result.returncode == 0:
-                output = (proc_result.stdout or proc_result.stderr or "").strip()
+            ret, out, err = run_capture(tool_config["command"], timeout=5)
+            if ret == 0 or out or err:
+                output = (out or err or "").strip()
                 version = self._extract_version(tool_name, output)
                 # Javaツールの場合、Javaバージョンを併記
                 if tool_config["language"] == "java" and java_version and version:
