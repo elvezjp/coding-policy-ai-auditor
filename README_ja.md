@@ -153,10 +153,25 @@ brew install pmd
 **Windows:**
 
 1. **Java**: [Oracle JDK](https://www.oracle.com/java/technologies/downloads/) 等から Windows 用インストーラーをダウンロードして実行
-2. **Checkstyle**: [GitHub Releases](https://github.com/checkstyle/checkstyle/releases) から `checkstyle-X.X.X-all.jar` をダウンロードし、任意のフォルダに配置
-3. **PMD**: [公式サイト](https://pmd.github.io/) から ZIP ファイルをダウンロードし、任意のフォルダに解凍。環境変数 PATH に `bin` フォルダを追加
 
-配置や設定方法は各ツールの最新版のドキュメントを参照してください。
+2. **Checkstyle**: [GitHub Releases](https://github.com/checkstyle/checkstyle/releases) から `checkstyle-X.X.X-all.jar` をダウンロードし、任意のフォルダに配置。同じフォルダに以下の内容で `checkstyle.bat` を作成する（`checkstyle-X.X.X-all.jar` の部分はダウンロードしたファイル名に合わせること）：
+   ```bat
+   @echo off
+   java -jar "%~dp0checkstyle-X.X.X-all.jar" %*
+   ```
+
+3. **PMD**: [公式サイト](https://pmd.github.io/) から ZIP ファイルをダウンロードし、任意のフォルダに解凍。
+
+バックエンドを起動する PowerShell セッションで以下を実行し、PATH を設定してから `uv run uvicorn ...` を起動する（パスは実際の配置場所に合わせて変更）：
+
+```powershell
+$CHECKSTYLE_DIR = "C:\path\to\checkstyle"       # checkstyle.bat を置いたフォルダ
+$PMD_BIN        = "C:\path\to\pmd-bin-X.X.X\bin" # PMD の bin フォルダ
+
+$env:PATH = "$CHECKSTYLE_DIR;$PMD_BIN;" + $env:PATH
+```
+
+> **Note**: `where.exe checkstyle` および `where.exe pmd` で両コマンドが見つかることを確認してからバックエンドを起動してください。
 
 
 ### Python静的解析ツール
