@@ -154,8 +154,25 @@ brew install pmd
 **Windows:**
 
 1. **Java**: Download and run the Windows installer from [Oracle JDK](https://www.oracle.com/java/technologies/downloads/) or similar
-2. **Checkstyle**: Download `checkstyle-X.X.X-all.jar` from [GitHub Releases](https://github.com/checkstyle/checkstyle/releases) and place it in any folder
-3. **PMD**: Download the ZIP file from the [official site](https://pmd.github.io/), extract to any folder, and add the `bin` folder to your PATH environment variable
+2. **Checkstyle**: Download `checkstyle-X.X.X-all.jar` from [GitHub Releases](https://github.com/checkstyle/checkstyle/releases), place it in any folder, and create `checkstyle.bat` in the same folder:
+   ```bat
+   @echo off
+   java -jar "%~dp0checkstyle-X.X.X-all.jar" %*
+   ```
+   (Replace `checkstyle-X.X.X-all.jar` with your downloaded file name.)
+3. **PMD**: Download the ZIP from the [official site](https://pmd.github.io/) or [GitHub Releases](https://github.com/pmd/pmd/releases), extract to any folder. Some archives nest folders (e.g. `pmd-dist-X.X.X-bin\pmd-bin-X.X.X\bin`). Add **only** the `bin` directory that contains `pmd.bat` to your PATH.
+
+Before starting the backend in PowerShell, prepend Java and tool locations to `PATH` (adjust paths to match your install):
+
+```powershell
+$JAVA_BIN       = "C:\path\to\jdk\bin"
+$CHECKSTYLE_DIR = "C:\path\to\checkstyle"
+$PMD_BIN        = "C:\path\to\...\bin"
+
+$env:PATH = "$JAVA_BIN;$CHECKSTYLE_DIR;$PMD_BIN;" + $env:PATH
+```
+
+Confirm with `where.exe java`, `where.exe checkstyle`, and `where.exe pmd`, then run `uv run uvicorn ...`.
 
 Please refer to the latest documentation for each tool for placement and configuration details.
 

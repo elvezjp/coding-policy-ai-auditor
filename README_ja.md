@@ -161,18 +161,19 @@ brew install pmd
    java -jar "%~dp0checkstyle-X.X.X-all.jar" %*
    ```
 
-3. **PMD**: [公式サイト](https://pmd.github.io/) から ZIP ファイルをダウンロードし、任意のフォルダに解凍。
+3. **PMD**: [公式サイト](https://pmd.github.io/) や [GitHub Releases](https://github.com/pmd/pmd/releases) から ZIP ファイルをダウンロードし、任意のフォルダに解凍。配布物によっては `pmd-dist-X.X.X-bin\pmd-bin-X.X.X\bin` のように **一段ネスト** した構成になります。PATH に追加するのは **`pmd.bat`（および `pmd`）が入っている `bin` フォルダ** のみです（親フォルダだけを追加するとコマンドが見つかりません）。
 
 バックエンドを起動する PowerShell セッションで以下を実行し、PATH を設定してから `uv run uvicorn ...` を起動する（パスは実際の配置場所に合わせて変更）：
 
 ```powershell
+$JAVA_BIN       = "C:\path\to\jdk\bin"          # java.exe がある bin（未設定だと pmd.bat が失敗することがある）
 $CHECKSTYLE_DIR = "C:\path\to\checkstyle"       # checkstyle.bat を置いたフォルダ
-$PMD_BIN        = "C:\path\to\pmd-bin-X.X.X\bin" # PMD の bin フォルダ
+$PMD_BIN        = "C:\path\to\...\bin"         # pmd.bat がある bin（例: ...\pmd-dist-7.23.0-bin\pmd-bin-7.23.0\bin）
 
-$env:PATH = "$CHECKSTYLE_DIR;$PMD_BIN;" + $env:PATH
+$env:PATH = "$JAVA_BIN;$CHECKSTYLE_DIR;$PMD_BIN;" + $env:PATH
 ```
 
-> **Note**: `where.exe checkstyle` および `where.exe pmd` で両コマンドが見つかることを確認してからバックエンドを起動してください。
+> **Note**: `where.exe java`、`where.exe checkstyle` および `where.exe pmd` で各コマンドが見つかることを確認してからバックエンドを起動してください。
 
 
 ### Python静的解析ツール
