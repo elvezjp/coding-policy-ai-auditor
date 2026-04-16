@@ -12,10 +12,14 @@
 
 ```
 versions/
-├── v0.4/
+├── v0.5/               # 最新版
 │   ├── frontend/      # フロントエンド全体
 │   ├── backend/       # バックエンド全体
-│   └── README.md      # 仕様・起動方法（必要に応じて追加）
+│   └── spec.md        # 詳細仕様書
+├── v0.4/
+│   ├── frontend/
+│   ├── backend/
+│   └── spec.md
 └── ...
 ```
 
@@ -30,10 +34,10 @@ versions/
 
 ```bash
 # 1. 最新バージョンディレクトリをコピー
-cp -r versions/v0.4 versions/v0.5
+cp -r versions/v0.5 versions/v0.6
 
 # 2. 新バージョンディレクトリで修正を実施
-cd versions/v0.5
+cd versions/v0.6
 
 # 3. READMEや関連ドキュメントのバージョン情報を更新
 # 4. 必要な修正を実施
