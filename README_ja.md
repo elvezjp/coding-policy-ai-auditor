@@ -18,6 +18,31 @@ https://github.com/user-attachments/assets/01b8fe08-861b-473a-8f1a-f4de00f751f4
 
 ---
 
+## 特徴
+
+- **判断系ルールの監査**: Lint等では検出できない意味的・主観的なコーディング規約違反を検出
+- **行番号付きの具体的な指摘**: 違反箇所を行番号で特定し、修正案まで出力
+- **曖昧さの取り扱い**: 判断が曖昧な場合は `要確認：` を付けて報告し、人間のレビューにつなげる設計
+- **マルチLLMプロバイダー対応**: AWS Bedrock、OpenAI、Anthropic APIを切り替えて利用可能
+- **静的解析との統合**: AI監査とCheckstyle、PMD、Ruff、Flake8、Pylintを組み合わせて実行
+- **設定ファイルジェネレーター**: LLM設定やルールセットをGUIで生成
+- **クロスプラットフォーム**: macOS、Linux、Windowsに対応
+
+## ユースケース
+
+- **コードレビューの自動化**: 静的解析ツールでは検出できない、社内固有のコーディング規約に対してJavaコードを監査
+- **コンプライアンスチェック**: 命名規則、コメント品質、設計パターンなどの判断系ルールへの準拠を確認
+- **レビュー支援**: 違反箇所と修正案を含む監査レポートを生成し、人間のレビューを効率化
+
+## システム構成
+
+- **フロントエンド**（UI）: Vite + React 19 + TypeScript + Tailwind CSS
+- **バックエンド**（API・変換処理）: Python / FastAPI
+  - MarkItDown / excel2md（Excel → Markdown 変換）
+  - add-line-numbers（行番号付与）
+  - マルチLLMプロバイダー対応（Bedrock / Anthropic / OpenAI）
+  - 静的解析ツール（Checkstyle / PMD / Ruff / Flake8 / Pylint）
+
 ## セットアップ手順
 
 ### 動作環境
@@ -196,6 +221,31 @@ uv sync --extra flake8
 - Ruff と Flake8 の両方がインストールされている場合、両方実行されます
 
 ---
+
+## ドキュメント
+
+- [詳細仕様書](versions/v0.5/spec.md) - v0.5 仕様書
+- [CHANGELOG.md](CHANGELOG.md) - バージョン履歴
+- [CONTRIBUTING.md](CONTRIBUTING.md) - コントリビューション方法
+- [SECURITY.md](SECURITY.md) - セキュリティポリシー
+- [AIオーディター形式](docs/ai-auditor-format/) - AIオーディター形式サンプルファイル
+
+## セキュリティ
+
+セキュリティに関する詳細は [SECURITY.md](SECURITY.md) を参照してください。
+
+- 入力ファイルは信頼できるソースからのものに限定してください
+- APIキーは環境変数で管理し、コードにハードコードしないでください
+- 生成された監査レポートにはソースコードの内容が含まれる場合があるため、共有前に内容を確認してください
+
+## コントリビューション
+
+コントリビューションを歓迎します。詳細は [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。
+
+- バグ報告: [GitHub Issues](https://github.com/elvezjp/coding-policy-ai-auditor/issues)
+- 機能提案: [GitHub Issues](https://github.com/elvezjp/coding-policy-ai-auditor/issues)
+- プルリクエスト: [GitHub Pull Requests](https://github.com/elvezjp/coding-policy-ai-auditor/pulls)
+
 ## 更新履歴
 
 詳細な変更履歴は [CHANGELOG.md](CHANGELOG.md) を参照してください。

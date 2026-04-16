@@ -18,6 +18,31 @@ https://github.com/user-attachments/assets/01b8fe08-861b-473a-8f1a-f4de00f751f4
 
 ---
 
+## Features
+
+- **Judgment-based rule auditing**: Detects semantic and subjective coding standard violations that linters cannot catch
+- **Line-number specific detection**: Identifies violations with exact line numbers and outputs suggested fixes
+- **Ambiguity handling**: Reports ambiguous cases with a `Requires Review:` prefix, designed for human review
+- **Multi-LLM provider support**: Switch between AWS Bedrock, OpenAI, and Anthropic APIs
+- **Static analysis integration**: Combine AI audit with Checkstyle, PMD, Ruff, Flake8, and Pylint
+- **Config file generator**: GUI-based generation of LLM settings and rulesets
+- **Cross-platform**: Supports macOS, Linux, and Windows
+
+## Use Cases
+
+- **Code review automation**: Audit Java code against company-specific coding standards that static analysis tools cannot detect
+- **Compliance checking**: Verify adherence to judgment-based rules such as naming conventions, comment quality, and design patterns
+- **Review support**: Generate audit reports with specific violation locations and fix suggestions to streamline human review
+
+## System Architecture
+
+- **Frontend** (UI): Vite + React 19 + TypeScript + Tailwind CSS
+- **Backend** (API / Processing): Python / FastAPI
+  - MarkItDown / excel2md (Excel to Markdown conversion)
+  - add-line-numbers (line numbering)
+  - Multi-LLM provider support (Bedrock / Anthropic / OpenAI)
+  - Static analysis tools (Checkstyle / PMD / Ruff / Flake8 / Pylint)
+
 ## Setup Instructions
 
 ### System Requirements
@@ -197,15 +222,40 @@ uv sync --extra flake8
 - If both Ruff and Flake8 are installed, both will be executed
 
 ---
+
+## Documentation
+
+- [Detailed Specification](versions/v0.5/spec.md) - v0.5 specification document
+- [CHANGELOG.md](CHANGELOG.md) - Version history
+- [CONTRIBUTING.md](CONTRIBUTING.md) - How to contribute
+- [SECURITY.md](SECURITY.md) - Security policy
+- [AI Auditor Format](docs/ai-auditor-format/) - Sample files for AI Auditor format
+
+## Security
+
+For details, see [SECURITY.md](SECURITY.md).
+
+- Process only files from trusted sources
+- Manage API keys via environment variables; do not hardcode them
+- Review generated audit reports before sharing, as they may contain source code content
+
+## Contributing
+
+Contributions are welcome. For details, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+- Bug reports: [GitHub Issues](https://github.com/elvezjp/coding-policy-ai-auditor/issues)
+- Feature suggestions: [GitHub Issues](https://github.com/elvezjp/coding-policy-ai-auditor/issues)
+- Pull requests: [GitHub Pull Requests](https://github.com/elvezjp/coding-policy-ai-auditor/pulls)
+
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md) for detailed change history.
 
-## Development Background
+## Background
 
-This tool is a small practical product that emerged from the development process of **IXV (pronounced "ik-siv")**, a development support AI targeting Japanese development documents and specifications.
+This tool was created as a small utility during the development of **IXV (Ixiv)**, a development support AI for Japanese development documents and specifications.
 
-IXV addresses challenges in understanding, structuring, and utilizing Japanese documents in system development. This repository publishes a portion of that work.
+IXV addresses the challenges of understanding, structuring, and utilizing Japanese documents in system development. This repository publishes a portion of that work.
 
 ## License
 
