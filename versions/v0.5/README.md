@@ -1,4 +1,4 @@
-# coding-policy-ai-auditor v0.3
+# coding-policy-ai-auditor
 
 このドキュメントは、本ツールの設計思想・技術詳細・内部構造に関する開発者向け情報です。
 
