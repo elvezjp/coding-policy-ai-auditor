@@ -77,7 +77,7 @@ We welcome enhancement suggestions! Please create an Issue with the following:
 - Python 3.11 or higher
 - Node.js 20.0.0 or higher
 - [uv](https://docs.astral.sh/uv/) package manager
-- AWS account (with Bedrock access permissions)
+- AWS account (optional; required only for Bedrock-based audit)
 
 ### Installation
 
@@ -175,7 +175,6 @@ When contributing:
 - Be respectful and inclusive
 - Provide constructive feedback
 - Help others when possible
-- Follow the code of conduct
 
 ## Questions
 

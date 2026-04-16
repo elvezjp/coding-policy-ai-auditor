@@ -101,7 +101,8 @@ AWS_REGION=ap-northeast-1
 AWS_ACCESS_KEY_ID=your_access_key_here
 AWS_SECRET_ACCESS_KEY=your_secret_key_here
 BEDROCK_MODEL_ID=global.anthropic.claude-haiku-4-5-20251001-v1:0
-FRONTEND_URL=http://localhost:5173
+BEDROCK_MAX_TOKENS=16384
+CORS_ORIGINS=http://localhost:5173
 ```
 
 **注意**: AWS Bedrockの利用には、AWSアカウントとClaude Haikuモデルへのアクセス権限が必要です。
