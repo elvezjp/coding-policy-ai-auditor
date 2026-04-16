@@ -1,166 +1,168 @@
-# セキュリティポリシー
+# Security Policy
 
-## サポートバージョン
+[English](./SECURITY.md) | [日本語](./SECURITY_ja.md)
 
-最新バージョンをサポートしています：
+## Supported Versions
 
-| バージョン | サポート状況       |
-| ---------- | ------------------ |
-| 0.5.x      | :white_check_mark: |
-| 0.4.x      | :white_check_mark: |
-| < 0.4      | :x:                |
+The latest version is supported:
 
-## 脆弱性の報告
+| Version | Supported          |
+| ------- | ------------------ |
+| 0.5.x   | :white_check_mark: |
+| 0.4.x   | :white_check_mark: |
+| < 0.4   | :x:                |
 
-coding-policy-ai-auditor にセキュリティ上の脆弱性を発見した場合は、以下の手順に従って責任ある報告をお願いします：
+## Reporting a Vulnerability
 
-### 報告方法
+If you discover a security vulnerability in coding-policy-ai-auditor, please follow these steps for responsible disclosure:
 
-1. セキュリティ脆弱性に関して公開の GitHub Issue を作成**しないでください**
-2. 以下の方法でメンテナーに詳細なレポートを送信してください：
-   - GitHub のプライベートセキュリティアドバイザリを作成する（推奨）
-   - 重大度の低い問題については「security」ラベルを付けて Issue を作成する
+### How to Report
 
-### 報告に含める内容
+1. **Do not** create a public GitHub Issue for security vulnerabilities
+2. Send a detailed report to the maintainers via one of the following methods:
+   - Create a GitHub Private Security Advisory (recommended)
+   - Create an Issue with the "security" label for low-severity issues
 
-レポートには以下の情報を含めてください：
+### What to Include
 
-- 脆弱性の説明
-- 問題を再現する手順
-- 潜在的な影響と重大度
-- 修正案や緩和策の提案
-- 連絡先情報（任意）
+Please include the following information in your report:
 
-### 報告例
+- Description of the vulnerability
+- Steps to reproduce the issue
+- Potential impact and severity
+- Suggested fix or mitigation (if any)
+- Contact information (optional)
+
+### Report Example
 
 ```
-件名: [SECURITY] ファイルアップロード時の潜在的な脆弱性
+Subject: [SECURITY] Potential vulnerability in file upload
 
-説明:
-特別に細工された Java ファイルをアップロードする際、
-サーバー側で予期しない動作が発生する可能性があります。
+Description:
+When uploading a specially crafted Java file,
+unexpected behavior may occur on the server side.
 
-再現手順:
-1. 非常に大きなサイズの Java ファイルを作成
-2. そのファイルをアップロード
-3. 監査処理を実行
+Steps to reproduce:
+1. Create a very large Java file
+2. Upload the file
+3. Run the audit process
 
-影響:
-サーバーリソースの過剰消費やサービス拒否を引き起こす可能性があります。
+Impact:
+May cause excessive server resource consumption or denial of service.
 
-修正案:
-ファイルサイズと行数の制限を強化する。
+Suggested fix:
+Strengthen file size and line count limits.
 ```
 
-## 対応スケジュール
+## Response Schedule
 
-- **初回応答**: 48時間以内
-- **状況更新**: 7日以内
-- **解決**: 重大度に応じて
-  - 緊急: 14日以内
-  - 高: 30日以内
-  - 中: 60日以内
-  - 低: 次回リリースサイクル
+- **Initial response**: Within 48 hours
+- **Status update**: Within 7 days
+- **Resolution**: Depending on severity
+  - Critical: Within 14 days
+  - High: Within 30 days
+  - Medium: Within 60 days
+  - Low: Next release cycle
 
-## セキュリティに関する考慮事項
+## Security Considerations
 
-### ファイル処理
+### File Processing
 
-coding-policy-ai-auditor は以下を含む可能性のあるファイルを処理します：
+coding-policy-ai-auditor processes files that may include:
 
-- Java ソースコードファイル（監査対象）
-- 規約プロンプトファイル（Markdown形式）
-- 設定ファイル（API キー、認証情報）
+- Java source code files (audit targets)
+- Policy prompt files (Markdown format)
+- Configuration files (API keys, credentials)
 
-**推奨事項:**
+**Recommendations:**
 
-1. 信頼できるソースからのファイルのみを処理する
-2. 外部ソースから受け取ったファイルは処理前に確認する
-3. 信頼できないファイルを処理する場合は、サンドボックス環境で実行する
-4. API キーや認証情報を含む設定ファイルは慎重に管理する
+1. Only process files from trusted sources
+2. Review files received from external sources before processing
+3. Use a sandbox environment when processing untrusted files
+4. Carefully manage configuration files containing API keys and credentials
 
-### API キーの管理
+### API Key Management
 
-このアプリケーションは以下の API を使用する可能性があります：
+This application may use the following APIs:
 
 - AWS Bedrock
 - Anthropic API
 - OpenAI API
 
-**推奨事項:**
+**Recommendations:**
 
-1. API キーを環境変数で管理し、コードにハードコードしない
-2. 最小権限の原則に従い、必要な権限のみを付与する
-3. API キーを定期的にローテーションする
-4. 本番環境と開発環境で異なる API キーを使用する
+1. Manage API keys via environment variables; do not hardcode them
+2. Follow the principle of least privilege; grant only necessary permissions
+3. Rotate API keys regularly
+4. Use different API keys for production and development environments
 
-### 入力検証
+### Input Validation
 
-coding-policy-ai-auditor には以下のセキュリティ対策が含まれています：
+coding-policy-ai-auditor includes the following security measures:
 
-- アップロードファイルの拡張子・MIMEタイプ検証
-- ファイルサイズの制限
-- 入力ファイルの検証
+- File extension and MIME type validation for uploads
+- File size limits
+- Input file validation
 
-### 出力のセキュリティ
+### Output Security
 
-生成された監査レポートを使用する際の注意点：
+Notes when using generated audit reports:
 
-- レポートには入力ファイル（Javaソースコード）の内容が含まれる可能性があります
-- 機密情報を含むファイルを監査した場合、レポートにも機密情報が含まれます
-- レポートを共有する前に内容を確認してください
+- Reports may contain content from input files (Java source code)
+- If files containing sensitive information are audited, the reports will also contain sensitive information
+- Review report content before sharing
 
-### 依存関係
+### Dependencies
 
-このプロジェクトは以下の主要な依存関係を使用しています：
+This project uses the following major dependencies:
 
-**バックエンド:**
-- `fastapi`: Web フレームワーク
-- `boto3`: AWS Bedrock 連携
-- `websockets`: リアルタイム通信
+**Backend:**
+- `fastapi`: Web framework
+- `boto3`: AWS Bedrock integration
+- `websockets`: Real-time communication
 
-**フロントエンド:**
-- `react`: UI フレームワーク
-- `vite`: ビルドツール
+**Frontend:**
+- `react`: UI framework
+- `vite`: Build tool
 
-これらの依存関係のセキュリティアドバイザリを監視し、必要に応じて更新しています。
+We monitor security advisories for these dependencies and update as needed.
 
-## セキュリティのベストプラクティス
+## Security Best Practices
 
-coding-policy-ai-auditor を使用する際の推奨事項：
+Recommendations when using coding-policy-ai-auditor:
 
-1. **最新版を維持**: 常に最新バージョンを使用する
-2. **入力を確認**: 処理前にファイルを検査する
-3. **サンドボックス処理**: 信頼できないファイルにはコンテナや VM を使用する
-4. **出力を検証**: 使用前に生成されたレポートを確認する
-5. **権限を制限**: 必要最小限の権限で実行する
-6. **依存関係を監視**: 依存ライブラリを最新に保つ
-7. **認証情報を保護**: API キーを安全に管理する
+1. **Keep up to date**: Always use the latest version
+2. **Verify inputs**: Inspect files before processing
+3. **Sandbox processing**: Use containers or VMs for untrusted files
+4. **Validate outputs**: Review generated reports before use
+5. **Limit permissions**: Run with minimum required privileges
+6. **Monitor dependencies**: Keep dependency libraries up to date
+7. **Protect credentials**: Manage API keys securely
 
-## 既知のセキュリティ制限
+## Known Security Limitations
 
-1. **ファイルサイズ**: 非常に大きな Java ファイルはメモリの問題を引き起こす可能性があります
-2. **LLM 出力**: AI による監査結果は常に正確とは限りません。重要な判断には人間の確認が必要です
-3. **静的解析**: 静的解析ツール（Checkstyle/PMD）はオプション機能であり、未インストールの場合はスキップされます
+1. **File size**: Very large Java files may cause memory issues
+2. **LLM output**: AI audit results are not always accurate. Human review is required for critical decisions
+3. **Static analysis**: Static analysis tools (Checkstyle/PMD) are optional features and will be skipped if not installed
 
-## セキュリティアップデート
+## Security Updates
 
-セキュリティアップデートは以下の形式でリリースされます：
+Security updates are released in the following formats:
 
-- 軽微な問題にはパッチバージョン（例: 0.4.1）
-- 重大な問題にはマイナーバージョン（例: 0.5.0）
-- CHANGELOG.md に `[SECURITY]` プレフィックス付きで記載
+- Patch versions for minor issues (e.g., 0.4.1)
+- Minor versions for critical issues (e.g., 0.5.0)
+- Documented in CHANGELOG.md with a `[SECURITY]` prefix
 
-## 謝辞
+## Acknowledgments
 
-脆弱性を責任を持って報告してくださるセキュリティ研究者に感謝します。有効なセキュリティ問題を報告された方は、以下で謝辞を記載します：
+We appreciate security researchers who responsibly report vulnerabilities. Those who report valid security issues will be acknowledged in:
 
-- CHANGELOG.md（匿名を希望される場合を除く）
-- 修正のリリースノート
+- CHANGELOG.md (unless anonymity is requested)
+- Release notes for the fix
 
-## ご質問
+## Questions
 
-脆弱性ではないセキュリティ関連のご質問は、以下の方法でお問い合わせください：
+For security-related questions that are not vulnerabilities, please contact us via:
 
-- 「security」ラベルを付けて Issue を作成
-- メンテナーに連絡
+- Create an Issue with the "security" label
+- Contact the maintainers
