@@ -162,7 +162,7 @@ class TestOpenAIProviderExecuteAudit:
             {"filename": "main.py", "contentWithLineNumbers": "   1: code"}
         ]
 
-        result = provider.execute_audit(mock_request, "v0.4.0")
+        result = provider.execute_audit(mock_request, "v0.5.0")
 
         assert result.success is True
         assert result.report is not None
@@ -209,7 +209,7 @@ class TestOpenAIProviderExecuteAudit:
             {"filename": "main.py", "contentWithLineNumbers": "   1: code"}
         ]
 
-        result = provider.execute_audit(mock_request, "v0.4.0")
+        result = provider.execute_audit(mock_request, "v0.5.0")
 
         assert result.success is False
         assert "認証エラー" in result.error

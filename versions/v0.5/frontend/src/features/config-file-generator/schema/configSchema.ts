@@ -4,7 +4,7 @@ export const CONFIG_SCHEMA: ConfigSchema = {
   meta: {
     outputTitle: 'コーディング規約-Javaプログラム AIオーディター 設定ファイル',
     outputFileName: 'auditor-config.md',
-    version: 'v0.4.0',
+    version: 'v0.5.0',
   },
   sections: [
     {
@@ -17,7 +17,7 @@ export const CONFIG_SCHEMA: ConfigSchema = {
           id: 'version',
           label: 'version',
           type: 'fixed',
-          value: 'v0.4.0',
+          value: 'v0.5.0',
         },
         {
           id: 'created_at',

@@ -184,7 +184,7 @@ class TestBuildAuditMeta:
     def test_ut_bed_005_build_audit_meta(self):
         """UT-BED-005: 規約・プログラム指定"""
         result = build_audit_meta(
-            version="v0.4.0",
+            version="v0.5.0",
             model_id="claude-haiku-4-5-20251001",
             provider="bedrock",
             rules=[
@@ -209,7 +209,7 @@ class TestBuildAuditMeta:
             output_tokens=3200,
         )
 
-        assert result["version"] == "v0.4.0"
+        assert result["version"] == "v0.5.0"
         assert result["modelId"] == "claude-haiku-4-5-20251001"
         assert result["provider"] == "bedrock"
         assert "executedAt" in result
@@ -229,7 +229,7 @@ class TestBuildAuditMeta:
     def test_build_audit_meta_default_values(self):
         """デフォルト値のテスト"""
         result = build_audit_meta(
-            version="v0.4.0",
+            version="v0.5.0",
             model_id="claude-haiku-4-5-20251001",
             provider="anthropic",
             rules=[{"filename": "spec.xlsx"}],
@@ -251,7 +251,7 @@ class TestBuildAuditInfoMarkdown:
     def test_ut_bed_004_build_audit_info_markdown(self):
         """UT-BED-004: 規約・プログラム指定"""
         audit_meta = {
-            "version": "v0.4.0",
+            "version": "v0.5.0",
             "modelId": "claude-haiku-4-5-20251001",
             "provider": "bedrock",
             "executedAt": "2024/12/21 14:30",
@@ -275,7 +275,7 @@ class TestBuildAuditInfoMarkdown:
 
         assert "# コーディング規約 AIオーディター 監査レポート" in result
         assert "## 監査情報" in result
-        assert "v0.4.0" in result
+        assert "v0.5.0" in result
         assert "claude-haiku-4-5-20251001" in result
         assert "bedrock" in result
         assert "2024/12/21 14:30" in result
@@ -289,7 +289,7 @@ class TestBuildAuditInfoMarkdown:
     def test_build_audit_info_markdown_empty_lists(self):
         """空のリストでもエラーにならない"""
         audit_meta = {
-            "version": "v0.4.0",
+            "version": "v0.5.0",
             "modelId": "claude-haiku-4-5-20251001",
             "provider": "openai",
             "executedAt": "2024/12/21 14:30",
