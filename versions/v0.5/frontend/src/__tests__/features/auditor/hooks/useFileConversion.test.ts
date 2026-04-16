@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { renderHook, act } from '@testing-library/react'
+import { renderHook, act, waitFor } from '@testing-library/react'
 import { useFileConversion } from '@features/auditor/hooks/useFileConversion'
 
 // APIモジュールのモック
@@ -248,31 +248,35 @@ describe('useFileConversion', () => {
     it('コードファイルを追加できる', async () => {
       const { result } = renderHook(() => useFileConversion())
 
-      await act(async () => {
+      act(() => {
         result.current.addCodeFiles([createMockFile('Main.java')])
-        // FileReaderの非同期処理が完了するのを待つ
-        await new Promise((resolve) => setTimeout(resolve, 0))
       })
 
-      expect(result.current.codeFiles).toHaveLength(1)
+      await waitFor(() => {
+        expect(result.current.codeFiles).toHaveLength(1)
+      })
       expect(result.current.codeFiles[0].filename).toBe('Main.java')
     })
 
     it('ファイル再選択時、既存ファイルはリセットされる', async () => {
       const { result } = renderHook(() => useFileConversion())
 
-      await act(async () => {
+      act(() => {
         result.current.addCodeFiles([createMockFile('Main.java')])
-        await new Promise((resolve) => setTimeout(resolve, 0))
       })
 
-      await act(async () => {
+      await waitFor(() => {
+        expect(result.current.codeFiles).toHaveLength(1)
+      })
+
+      act(() => {
         result.current.addCodeFiles([createMockFile('App.java')])
-        await new Promise((resolve) => setTimeout(resolve, 0))
       })
 
-      expect(result.current.codeFiles).toHaveLength(1)
-      expect(result.current.codeFiles[0].filename).toBe('App.java')
+      await waitFor(() => {
+        expect(result.current.codeFiles).toHaveLength(1)
+        expect(result.current.codeFiles[0].filename).toBe('App.java')
+      })
     })
   })
 
@@ -280,17 +284,16 @@ describe('useFileConversion', () => {
     it('指定したコードファイルを削除できる', async () => {
       const { result } = renderHook(() => useFileConversion())
 
-      await act(async () => {
+      act(() => {
         result.current.addCodeFiles([
           createMockFile('Main.java'),
           createMockFile('App.java'),
         ])
-        // FileReaderの非同期処理が完了するのを待つ
-        await new Promise((resolve) => setTimeout(resolve, 10))
       })
 
-      // ファイル追加の確認
-      expect(result.current.codeFiles).toHaveLength(2)
+      await waitFor(() => {
+        expect(result.current.codeFiles).toHaveLength(2)
+      })
 
       act(() => {
         result.current.removeCodeFile('Main.java')

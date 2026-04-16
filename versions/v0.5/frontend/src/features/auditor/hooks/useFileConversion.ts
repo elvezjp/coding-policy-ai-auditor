@@ -173,6 +173,11 @@ export function useFileConversion(): UseFileConversionReturn {
   }, [])
 
   const addCodeFiles = useCallback((files: File[]) => {
+    // 再選択時に既存ファイルを即座にリセット
+    setCodeFiles([])
+    setCodeWithLineNumbers(null)
+    setCodeStatus('')
+
     // ファイルの内容を読み込んでrawContentを設定
     const readFilePromises = files.map((file) => {
       return new Promise<CodeFile>((resolve) => {
@@ -197,8 +202,6 @@ export function useFileConversion(): UseFileConversionReturn {
 
     Promise.all(readFilePromises).then((newFiles) => {
       setCodeFiles(newFiles)
-      setCodeWithLineNumbers(null)
-      setCodeStatus('')
     })
   }, [])
 
