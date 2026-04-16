@@ -1,87 +1,111 @@
-# 変更履歴
+# Changelog
 
-このプロジェクトに対するすべての重要な変更はこのファイルに記録されます。
+[English](./CHANGELOG.md) | [日本語](./CHANGELOG_ja.md)
 
-フォーマットは [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) に基づいており、
-このプロジェクトは [セマンティックバージョニング](https://semver.org/lang/ja/) に準拠しています。
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.5.0] - 2026-04-16
+
+### Added
+- **Windows static analysis support**: Safely execute `.bat/.cmd` tools via `cmd /c` (without using `shell=True`)
+- **CP932 encoding support**: UTF-8/CP932 fallback decoding for tool output, automatic CP932-to-UTF-8 conversion for analysis target files
+- **Unified process execution**: Unified `subprocess.run()` to `run_capture()` for Windows/Unix compatibility
+- **v0.5 CI jobs**: Added v0.5 backend and frontend tests to GitHub Actions (Windows/macOS/Linux)
+
+### Fixed
+- **File re-selection reset bug**: Fixed `addCodeFiles` to immediately reset state on re-selection ([Issue #15](https://github.com/elvezjp/coding-policy-ai-auditor/issues/15))
+- **Test instability**: Replaced `setTimeout(0)` async waits with `waitFor` for stability
+
+### Changed
+- Raised minimum Python version to 3.11
+
+### Note
+- Based on the implementation from PR #14 (by atsutakaGithub)
+- Backward compatible with v0.4
 
 ## [0.4.0] - 2026-01-28
 
-### 追加
-- **規約選択機能**: AIオーディター形式で規約をチェックボックスで個別選択
-  - 選択された規約のみをMarkdownに変換
-  - リンクされた詳細シートも動的にフィルタリング
+### Added
+- **Policy selection feature**: Select individual policies via checkboxes in AI Auditor format
+  - Only selected policies are converted to Markdown
+  - Linked detail sheets are dynamically filtered
 
-### 注意
-- v0.3との後方互換性があります
-- AIオーディター形式Excelのサンプルは `docs/ai-auditor-format/` を参照
+### Note
+- Backward compatible with v0.3
+- See `docs/ai-auditor-format/` for AI Auditor format Excel samples
 
 ## [0.3.0] - 2026-01-26
 
-### 追加
-- **マルチLLMプロバイダー対応**: AWS Bedrock / OpenAI / Anthropic を切り替えて監査実行が可能に
-- **静的解析機能（Java）**: Checkstyle / PMD による機械検出ルールのチェック
-- **静的解析機能（Python）**: Ruff / Flake8 / Pylint による機械検出ルールのチェック
-- **設定ファイルジェネレーター**: LLM設定やルールセットをGUIで生成
-- **単体テスト**: バックエンドの主要機能に対するテストを実装
-- **公開用ドキュメント整備**: CONTRIBUTING.md、SECURITY.md、GitHub テンプレート
+### Added
+- **Multi-LLM provider support**: Switch between AWS Bedrock / OpenAI / Anthropic for audit execution
+- **Static analysis (Java)**: Checkstyle / PMD for mechanical rule checking
+- **Static analysis (Python)**: Ruff / Flake8 / Pylint for mechanical rule checking
+- **Config file generator**: GUI-based generation of LLM settings and rulesets
+- **Unit tests**: Tests for major backend features
+- **Public documentation**: CONTRIBUTING.md, SECURITY.md, GitHub templates
 
-### 変更
-- **フロントエンド刷新**: Vite + React 19 + TypeScript + Tailwind CSS によるモダンなSPA構成
-- **バックエンド改善**: FastAPI + Python 3.10+ による高速なAPI
-- **excel2md v2.0対応**: git subtreeを更新しv2.0に対応
+### Changed
+- **Frontend redesign**: Modern SPA with Vite + React 19 + TypeScript + Tailwind CSS
+- **Backend improvements**: High-performance API with FastAPI + Python 3.10+
+- **excel2md v2.0**: Updated git subtree to v2.0
 
-### 注意
-- v0.1との後方互換性はありません
-- 静的解析ツール（Checkstyle/PMD/Ruff/Flake8/Pylint）は未インストールでもAI監査は動作します
+### Note
+- Not backward compatible with v0.1
+- Static analysis tools (Checkstyle/PMD/Ruff/Flake8/Pylint) are optional; AI audit works without them
 
 ## [0.1.0] - 2026-01-09
 
-### 追加
-- **初期リリース**: 基本的な監査機能を実装
-- **Javaファイルアップロード**: ドラッグ&ドロップ対応
-- **ルールプロンプト管理**: 新規作成、MDファイルインポート、削除
-- **リアルタイム進捗表示**: WebSocketによる進捗配信
-- **監査結果フィルタリング**: 違反/要確認の表示切替
-- **Markdownレポート出力**: 監査結果のダウンロード機能
-- **静的解析サービス**: Checkstyle / PMD による機械検出
+### Added
+- **Initial release**: Basic audit functionality
+- **Java file upload**: Drag & drop support
+- **Rule prompt management**: Create new, import MD files, delete
+- **Real-time progress**: WebSocket-based progress updates
+- **Audit result filtering**: Toggle violation/requires-review display
+- **Markdown report output**: Download audit results
+- **Static analysis service**: Checkstyle / PMD mechanical detection
 
-### 既知の問題
-- AWS Bedrock連携でエラーが発生する場合がある
-- 単体テストが未実装
-
----
-
-## リンク
-
-- [リポジトリ](https://github.com/elvezjp/coding-policy-ai-auditor)
-- [Issue](https://github.com/elvezjp/coding-policy-ai-auditor/issues)
+### Known Issues
+- Errors may occur with AWS Bedrock integration
+- Unit tests not yet implemented
 
 ---
 
-## バージョン比較
+## Links
 
-| バージョン | 主な機能 |
-|------------|----------|
-| 0.4.0      | AIオーディター形式Excel対応、規約選択機能 |
-| 0.3.0      | マルチLLM対応、静的解析（Java+Python）、設定ジェネレーター |
-| 0.1.0      | 初期リリース、基本監査機能、静的解析（Java） |
+- [Repository](https://github.com/elvezjp/coding-policy-ai-auditor)
+- [Issues](https://github.com/elvezjp/coding-policy-ai-auditor/issues)
 
-### 機能マトリクス
+---
 
-| 機能 | v0.4 | v0.3 | v0.1 |
-|------|------|------|------|
-| Javaファイルアップロード | ✅ | ✅ | ✅ |
-| ルールプロンプト管理 | ✅ | ✅ | ✅ |
-| リアルタイム進捗表示 | ✅ | ✅ | ✅ |
-| LLM監査実行 | ✅ | ✅ | ⚠️ |
-| 静的解析 (Checkstyle/PMD) | ✅ | ✅ | ✅ |
-| 静的解析 (Ruff/Flake8/Pylint) | ✅ | ✅ | ❌ |
-| 結果フィルタリング | ✅ | ✅ | ✅ |
-| Markdownレポート出力 | ✅ | ✅ | ✅ |
-| 設定ファイルジェネレーター | ✅ | ✅ | ❌ |
-| 単体テスト | ✅ | ✅ | ❌ |
-| AIオーディター形式Excel | ✅ | ❌ | ❌ |
-| 規約選択機能 | ✅ | ❌ | ❌ |
+## Version Comparison
 
-**凡例**: ✅ 実装済み / ⚠️ 問題あり / ❌ 未実装
+| Version | Key Features |
+|---------|-------------|
+| 0.5.0   | Windows static analysis support, CP932 encoding support, test stabilization |
+| 0.4.0   | AI Auditor format Excel support, policy selection feature |
+| 0.3.0   | Multi-LLM support, static analysis (Java+Python), config generator |
+| 0.1.0   | Initial release, basic audit functionality, static analysis (Java) |
+
+### Feature Matrix
+
+| Feature | v0.5 | v0.4 | v0.3 | v0.1 |
+|---------|------|------|------|------|
+| Java file upload | ✅ | ✅ | ✅ | ✅ |
+| Rule prompt management | ✅ | ✅ | ✅ | ✅ |
+| Real-time progress | ✅ | ✅ | ✅ | ✅ |
+| LLM audit execution | ✅ | ✅ | ✅ | ⚠️ |
+| Static analysis (Checkstyle/PMD) | ✅ | ✅ | ✅ | ✅ |
+| Static analysis (Ruff/Flake8/Pylint) | ✅ | ✅ | ✅ | ❌ |
+| Result filtering | ✅ | ✅ | ✅ | ✅ |
+| Markdown report output | ✅ | ✅ | ✅ | ✅ |
+| Config file generator | ✅ | ✅ | ✅ | ❌ |
+| Unit tests | ✅ | ✅ | ✅ | ❌ |
+| AI Auditor format Excel | ✅ | ✅ | ❌ | ❌ |
+| Policy selection feature | ✅ | ✅ | ❌ | ❌ |
+| Windows static analysis | ✅ | ❌ | ❌ | ❌ |
+| CP932 encoding support | ✅ | ❌ | ❌ | ❌ |
+
+**Legend**: ✅ Implemented / ⚠️ Has issues / ❌ Not implemented

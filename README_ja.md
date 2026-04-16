@@ -18,6 +18,31 @@ https://github.com/user-attachments/assets/01b8fe08-861b-473a-8f1a-f4de00f751f4
 
 ---
 
+## 特徴
+
+- **判断系ルールの監査**: Lint等では検出できない意味的・主観的なコーディング規約違反を検出
+- **行番号付きの具体的な指摘**: 違反箇所を行番号で特定し、修正案まで出力
+- **曖昧さの取り扱い**: 判断が曖昧な場合は `要確認：` を付けて報告し、人間のレビューにつなげる設計
+- **マルチLLMプロバイダー対応**: AWS Bedrock、OpenAI、Anthropic APIを切り替えて利用可能
+- **静的解析との統合**: AI監査とCheckstyle、PMD、Ruff、Flake8、Pylintを組み合わせて実行
+- **設定ファイルジェネレーター**: LLM設定やルールセットをGUIで生成
+- **クロスプラットフォーム**: macOS、Linux、Windowsに対応
+
+## ユースケース
+
+- **コードレビューの自動化**: 静的解析ツールでは検出できない、社内固有のコーディング規約に対してJavaコードを監査
+- **コンプライアンスチェック**: 命名規則、コメント品質、設計パターンなどの判断系ルールへの準拠を確認
+- **レビュー支援**: 違反箇所と修正案を含む監査レポートを生成し、人間のレビューを効率化
+
+## システム構成
+
+- **フロントエンド**（UI）: Vite + React 19 + TypeScript + Tailwind CSS
+- **バックエンド**（API・変換処理）: Python / FastAPI
+  - MarkItDown / excel2md（Excel → Markdown 変換）
+  - add-line-numbers（行番号付与）
+  - マルチLLMプロバイダー対応（Bedrock / Anthropic / OpenAI）
+  - 静的解析ツール（Checkstyle / PMD / Ruff / Flake8 / Pylint）
+
 ## セットアップ手順
 
 ### 動作環境
@@ -42,7 +67,7 @@ https://github.com/user-attachments/assets/01b8fe08-861b-473a-8f1a-f4de00f751f4
 ### 2. フロントエンドを起動する
 
 ```bash
-cd versions/v0.4/frontend
+cd versions/v0.5/frontend
 npm install
 npm run dev
 ```
@@ -52,7 +77,7 @@ npm run dev
 ### 3. バックエンドを起動する
 
 ```bash
-cd versions/v0.4/backend
+cd versions/v0.5/backend
 
 # 環境変数を設定
 cp .env.example .env
@@ -76,7 +101,8 @@ AWS_REGION=ap-northeast-1
 AWS_ACCESS_KEY_ID=your_access_key_here
 AWS_SECRET_ACCESS_KEY=your_secret_key_here
 BEDROCK_MODEL_ID=global.anthropic.claude-haiku-4-5-20251001-v1:0
-FRONTEND_URL=http://localhost:5173
+BEDROCK_MAX_TOKENS=16384
+CORS_ORIGINS=http://localhost:5173
 ```
 
 **注意**: AWS Bedrockの利用には、AWSアカウントとClaude Haikuモデルへのアクセス権限が必要です。
@@ -89,10 +115,10 @@ FRONTEND_URL=http://localhost:5173
 
 ```bash
 # フロントエンドを起動（ターミナル1）
-cd versions/v0.4/frontend && npm run dev
+cd versions/v0.5/frontend && npm run dev
 
 # バックエンドを起動（ターミナル2）
-cd versions/v0.4/backend && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+cd versions/v0.5/backend && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 # ブラウザで http://localhost:5173 にアクセス
 ```
@@ -118,11 +144,12 @@ coding-policy-ai-auditor/
 ├── docs/
 │   └── ai-auditor-format/  # AIオーディター形式サンプルファイル
 ├── versions/
-│   ├── v0.4/               # 最新版（推奨）
+│   ├── v0.5/               # 最新版（推奨）
 │   │   ├── frontend/       # フロントエンドアプリケーション
 │   │   ├── backend/        # バックエンドアプリケーション
 │   │   └── spec.md         # 詳細仕様書
-│   └── v0.3/               # 旧バージョン
+│   ├── v0.4/               # 旧バージョン
+│   └── v0.3/
 └── ...
 ```
 
@@ -153,10 +180,26 @@ brew install pmd
 **Windows:**
 
 1. **Java**: [Oracle JDK](https://www.oracle.com/java/technologies/downloads/) 等から Windows 用インストーラーをダウンロードして実行
-2. **Checkstyle**: [GitHub Releases](https://github.com/checkstyle/checkstyle/releases) から `checkstyle-X.X.X-all.jar` をダウンロードし、任意のフォルダに配置
-3. **PMD**: [公式サイト](https://pmd.github.io/) から ZIP ファイルをダウンロードし、任意のフォルダに解凍。環境変数 PATH に `bin` フォルダを追加
 
-配置や設定方法は各ツールの最新版のドキュメントを参照してください。
+2. **Checkstyle**: [GitHub Releases](https://github.com/checkstyle/checkstyle/releases) から `checkstyle-X.X.X-all.jar` をダウンロードし、任意のフォルダに配置。同じフォルダに以下の内容で `checkstyle.bat` を作成する（`checkstyle-X.X.X-all.jar` の部分はダウンロードしたファイル名に合わせること）：
+   ```bat
+   @echo off
+   java -jar "%~dp0checkstyle-X.X.X-all.jar" %*
+   ```
+
+3. **PMD**: [公式サイト](https://pmd.github.io/) や [GitHub Releases](https://github.com/pmd/pmd/releases) から ZIP ファイルをダウンロードし、任意のフォルダに解凍。配布物によっては `pmd-dist-X.X.X-bin\pmd-bin-X.X.X\bin` のように **一段ネスト** した構成になります。PATH に追加するのは **`pmd.bat`（および `pmd`）が入っている `bin` フォルダ** のみです（親フォルダだけを追加するとコマンドが見つかりません）。
+
+バックエンドを起動する PowerShell セッションで以下を実行し、PATH を設定してから `uv run uvicorn ...` を起動する（パスは実際の配置場所に合わせて変更）：
+
+```powershell
+$JAVA_BIN       = "C:\path\to\jdk\bin"          # java.exe がある bin（未設定だと pmd.bat が失敗することがある）
+$CHECKSTYLE_DIR = "C:\path\to\checkstyle"       # checkstyle.bat を置いたフォルダ
+$PMD_BIN        = "C:\path\to\...\bin"         # pmd.bat がある bin（例: ...\pmd-dist-7.23.0-bin\pmd-bin-7.23.0\bin）
+
+$env:PATH = "$JAVA_BIN;$CHECKSTYLE_DIR;$PMD_BIN;" + $env:PATH
+```
+
+> **Note**: `where.exe java`、`where.exe checkstyle` および `where.exe pmd` で各コマンドが見つかることを確認してからバックエンドを起動してください。
 
 
 ### Python静的解析ツール
@@ -179,6 +222,31 @@ uv sync --extra flake8
 - Ruff と Flake8 の両方がインストールされている場合、両方実行されます
 
 ---
+
+## ドキュメント
+
+- [詳細仕様書](versions/v0.5/spec.md) - v0.5 仕様書
+- [CHANGELOG.md](CHANGELOG.md) - バージョン履歴
+- [CONTRIBUTING.md](CONTRIBUTING.md) - コントリビューション方法
+- [SECURITY.md](SECURITY.md) - セキュリティポリシー
+- [AIオーディター形式](docs/ai-auditor-format/) - AIオーディター形式サンプルファイル
+
+## セキュリティ
+
+セキュリティに関する詳細は [SECURITY.md](SECURITY.md) を参照してください。
+
+- 入力ファイルは信頼できるソースからのものに限定してください
+- APIキーは環境変数で管理し、コードにハードコードしないでください
+- 生成された監査レポートにはソースコードの内容が含まれる場合があるため、共有前に内容を確認してください
+
+## コントリビューション
+
+コントリビューションを歓迎します。詳細は [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。
+
+- バグ報告: [GitHub Issues](https://github.com/elvezjp/coding-policy-ai-auditor/issues)
+- 機能提案: [GitHub Issues](https://github.com/elvezjp/coding-policy-ai-auditor/issues)
+- プルリクエスト: [GitHub Pull Requests](https://github.com/elvezjp/coding-policy-ai-auditor/pulls)
+
 ## 更新履歴
 
 詳細な変更履歴は [CHANGELOG.md](CHANGELOG.md) を参照してください。
