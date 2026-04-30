@@ -166,6 +166,25 @@ npm install     # added 310 packages, found 0 vulnerabilities
 
 PR マージ前のためアラートは引き続き open 表示だが、`versions/v0.5/` のロックファイル更新が main にマージされた時点で 9 件すべて自動 close される見込み。
 
+> 追記: PR #18 のプッシュ後、`versions/v0.5/` 配下のアラート（#37〜#56）は Dependabot 側で `fixed` に切り替わったことを確認した（過去に `auto_dismissed` だった `ajv` / `brace-expansion` 等も連動して `fixed` 表示になっている）。
+
+### Phase 2 追加実施ログ（2026-04-30、新規発生分の Dismiss）
+
+PR #18 作成後の Dependabot 再スキャンにより、対象外ディレクトリで新規アラートが計 **16 件**発生した（旧バージョン配下のみ。Malware ／ subtree への新規発生はなし）。Phase 2 と同じ手順・同じコメント文面（旧バージョン用）で `not_used` として Dismiss した。
+
+#### 追加 Dismiss 一覧
+
+| グループ | 件数 | アラート番号 | 内容 |
+|---|---|---|---|
+| `versions/v0.3/backend/uv.lock` | 7 | #57〜#63 | urllib3, python-multipart × 2, protobuf, requests, Pygments, pytest |
+| `versions/v0.3/frontend/package-lock.json` | 1 | #64 | postcss |
+| `versions/v0.4/backend/uv.lock` | 7 | #65〜#71 | 同上 |
+| `versions/v0.4/frontend/package-lock.json` | 1 | #72 | postcss |
+
+#### 実行後の状態
+
+`gh api repos/elvezjp/coding-policy-ai-auditor/dependabot/alerts --jq '[.[] | select(.state=="open")] | length'` で再集計し、**open 状態は 0 件**を確認。
+
 ## 対象ファイル一覧（Phase 1）
 
 ```
