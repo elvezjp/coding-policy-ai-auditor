@@ -98,6 +98,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Key Features |
 |---------|-------------|
+| 0.5.1   | Path Traversal vulnerability fix |
 | 0.5.0   | Windows static analysis support, CP932 encoding support, test stabilization |
 | 0.4.0   | AI Auditor format Excel support, policy selection feature |
 | 0.3.0   | Multi-LLM support, static analysis (Java+Python), config generator |
@@ -105,21 +106,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Feature Matrix
 
-| Feature | v0.5 | v0.4 | v0.3 | v0.1 |
-|---------|------|------|------|------|
-| Java file upload | ✅ | ✅ | ✅ | ✅ |
-| Rule prompt management | ✅ | ✅ | ✅ | ✅ |
-| Real-time progress | ✅ | ✅ | ✅ | ✅ |
-| LLM audit execution | ✅ | ✅ | ✅ | ⚠️ |
-| Static analysis (Checkstyle/PMD) | ✅ | ✅ | ✅ | ✅ |
-| Static analysis (Ruff/Flake8/Pylint) | ✅ | ✅ | ✅ | ❌ |
-| Result filtering | ✅ | ✅ | ✅ | ✅ |
-| Markdown report output | ✅ | ✅ | ✅ | ✅ |
-| Config file generator | ✅ | ✅ | ✅ | ❌ |
-| Unit tests | ✅ | ✅ | ✅ | ❌ |
-| AI Auditor format Excel | ✅ | ✅ | ❌ | ❌ |
-| Policy selection feature | ✅ | ✅ | ❌ | ❌ |
-| Windows static analysis | ✅ | ❌ | ❌ | ❌ |
-| CP932 encoding support | ✅ | ❌ | ❌ | ❌ |
+| Feature | v0.5.1 | v0.5 | v0.4 | v0.3 | v0.1 |
+|---------|--------|------|------|------|------|
+| Java file upload | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Rule prompt management | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Real-time progress | ✅ | ✅ | ✅ | ✅ | ✅ |
+| LLM audit execution | ✅ | ✅ | ✅ | ✅ | ⚠️ |
+| Static analysis (Checkstyle/PMD) | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Static analysis (Ruff/Flake8/Pylint) | ✅ | ✅ | ✅ | ✅ | ❌ |
+| Result filtering | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Markdown report output | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Config file generator | ✅ | ✅ | ✅ | ✅ | ❌ |
+| Unit tests | ✅ | ✅ | ✅ | ✅ | ❌ |
+| AI Auditor format Excel | ✅ | ✅ | ✅ | ❌ | ❌ |
+| Policy selection feature | ✅ | ✅ | ✅ | ❌ | ❌ |
+| Windows static analysis | ✅ | ✅ | ❌ | ❌ | ❌ |
+| CP932 encoding support | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Path Traversal vulnerability fix (#19) | ✅ | ⚠️ | ⚠️ | ⚠️ | - |
 
 **Legend**: ✅ Implemented / ⚠️ Has issues / ❌ Not implemented
