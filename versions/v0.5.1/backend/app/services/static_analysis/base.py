@@ -48,9 +48,16 @@ class ToolRunner(ABC):
 
     def _create_temp_files(self, files: list[dict[str, str]], tmpdir: str) -> None:
         """一時ディレクトリにファイルを作成"""
+        tmpdir_resolved = Path(tmpdir).resolve()
         for file_data in files:
             relative_path = self._safe_relative_path(file_data)
             target_path = Path(tmpdir) / relative_path
+
+            # resolve 後に tmpdir 配下に収まるかを確認 (Path Traversal の最終防衛線)
+            resolved = target_path.resolve()
+            if not resolved.is_relative_to(tmpdir_resolved):
+                raise ValueError(f"Path traversal detected: {target_path}")
+
             target_path.parent.mkdir(parents=True, exist_ok=True)
 
             src_path = file_data.get("path")
@@ -82,7 +89,10 @@ class ToolRunner(ABC):
         file_path = file_data.get("path") or file_data.get("name", "")
         candidate = Path(file_path)
         if candidate.is_absolute() or ".." in candidate.parts:
-            return Path(file_data.get("name", ""))
+            # fallback でも name フィールドのディレクトリ部分を除去して
+            # 末端ファイル名のみを採用する (issue #19)
+            name_only = Path(file_data.get("name", "")).name
+            return Path(name_only) if name_only else Path("unknown_file")
         return candidate
 
     def _build_result(

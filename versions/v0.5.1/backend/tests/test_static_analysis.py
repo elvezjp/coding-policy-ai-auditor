@@ -338,6 +338,130 @@ class TestCreateTempFiles:
         assert "日本語コメント" in result
 
 
+class TestSafeRelativePath:
+    """base.py _safe_relative_path のテスト (issue #19)"""
+
+    def _runner(self):
+        from app.services.static_analysis.tools.checkstyle import CheckstyleRunner
+
+        return CheckstyleRunner()
+
+    def test_normal_relative_path_is_preserved(self):
+        """通常の相対パスはそのまま返ること"""
+        from pathlib import Path
+
+        result = self._runner()._safe_relative_path(
+            {"name": "src/app.py", "path": "src/app.py"}
+        )
+        assert result == Path("src/app.py")
+
+    def test_dotdot_in_name_falls_back_to_basename(self):
+        """name に .. が含まれる場合、ディレクトリ部分を除去した basename になること"""
+        from pathlib import Path
+
+        result = self._runner()._safe_relative_path(
+            {"name": "../../../tmp/evil.py"}
+        )
+        assert result == Path("evil.py")
+
+    def test_dotdot_in_path_falls_back_to_name_basename(self):
+        """path に .. があっても fallback の name の basename が返ること"""
+        from pathlib import Path
+
+        result = self._runner()._safe_relative_path(
+            {"path": "../../etc/passwd", "name": "sub/dir/foo.py"}
+        )
+        assert result == Path("foo.py")
+
+    def test_absolute_path_falls_back_to_name_basename(self):
+        """絶対パスの場合も fallback の name の basename が返ること"""
+        from pathlib import Path
+
+        result = self._runner()._safe_relative_path(
+            {"path": "/etc/passwd", "name": "passwd"}
+        )
+        assert result == Path("passwd")
+
+    def test_empty_name_fallback_returns_unknown_file(self):
+        """name が空文字列で fallback に入った場合、unknown_file が返ること"""
+        from pathlib import Path
+
+        result = self._runner()._safe_relative_path(
+            {"name": "", "path": "../../x.py"}
+        )
+        assert result == Path("unknown_file")
+
+
+class TestCreateTempFilesPathTraversal:
+    """_create_temp_files の Path Traversal 防御テスト (issue #19)"""
+
+    def test_traversal_via_name_does_not_escape_tmpdir(self, tmp_path):
+        """name に .. を含むリクエストでも tmpdir 外に書き込まれないこと"""
+        from app.services.static_analysis.tools.checkstyle import CheckstyleRunner
+
+        out_dir = tmp_path / "out"
+        out_dir.mkdir()
+
+        runner = CheckstyleRunner()
+        runner._create_temp_files(
+            [{"name": "../../../tmp/evil.py", "content": "x = 1"}],
+            str(out_dir),
+        )
+
+        # tmpdir 外への流出がないこと
+        evil_in_root = tmp_path / "evil.py"
+        evil_in_parent = tmp_path.parent / "evil.py"
+        assert not evil_in_root.exists()
+        assert not evil_in_parent.exists()
+
+        # tmpdir 内に basename のみで作成されていること
+        assert (out_dir / "evil.py").exists()
+
+    def test_resolve_boundary_check_blocks_synthetic_traversal(
+        self, tmp_path, monkeypatch
+    ):
+        """_safe_relative_path を迂回しても resolve 後の境界チェックで弾かれること"""
+        from pathlib import Path
+        from app.services.static_analysis.tools.checkstyle import CheckstyleRunner
+
+        out_dir = tmp_path / "out"
+        out_dir.mkdir()
+
+        runner = CheckstyleRunner()
+
+        # _safe_relative_path 自体を traversal を返すように差し替えて
+        # _create_temp_files 側の境界チェックが機能することを確認する
+        monkeypatch.setattr(
+            runner, "_safe_relative_path", lambda fd: Path("../escaped.py")
+        )
+
+        with pytest.raises(ValueError, match="Path traversal detected"):
+            runner._create_temp_files(
+                [{"name": "x.py", "content": "x = 1"}],
+                str(out_dir),
+            )
+
+        # tmpdir の親に escaped.py が作られていないこと
+        assert not (tmp_path / "escaped.py").exists()
+
+    def test_normal_subdir_still_works(self, tmp_path):
+        """通常のサブディレクトリパスは従来通り動作すること"""
+        from app.services.static_analysis.tools.checkstyle import CheckstyleRunner
+
+        out_dir = tmp_path / "out"
+        out_dir.mkdir()
+
+        runner = CheckstyleRunner()
+        runner._create_temp_files(
+            [{"name": "pkg/sub/Foo.java", "content": "class Foo {}"}],
+            str(out_dir),
+        )
+
+        target = out_dir / "pkg" / "sub" / "Foo.java"
+        assert target.exists()
+        assert target.read_text(encoding="utf-8") == "class Foo {}"
+
+
 class TestCheckstyleRunner:
     """CheckstyleRunnerのテスト"""
 
