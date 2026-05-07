@@ -42,14 +42,14 @@ We welcome enhancement suggestions! Please create an Issue with the following:
 3. **Write tests** for your changes
    ```bash
    # Run backend tests
-   cd versions/v0.5/backend
+   cd versions/v0.5.1/backend
    uv run pytest tests/ -v
 
    # Run tests with coverage
    uv run pytest tests/ --cov=app --cov-report=html
 
    # Run frontend tests
-   cd versions/v0.5/frontend
+   cd versions/v0.5.1/frontend
    npm test
    ```
 
@@ -87,7 +87,7 @@ git clone https://github.com/YOUR-USERNAME/coding-policy-ai-auditor.git
 cd coding-policy-ai-auditor
 
 # Install backend dependencies
-cd versions/v0.5/backend
+cd versions/v0.5.1/backend
 uv sync
 
 # Install frontend dependencies
@@ -99,7 +99,7 @@ npm install
 
 ```bash
 # Run backend tests
-cd versions/v0.5/backend
+cd versions/v0.5.1/backend
 uv run pytest tests/ -v
 
 # Run a specific test file
@@ -159,7 +159,7 @@ Closes #123
 ## Version Management
 
 When contributing:
-- Focus on the latest version (`versions/v0.5/`)
+- Focus on the latest version (`versions/v0.5.1/`)
 - Maintain backward compatibility where possible
 - Clearly document breaking changes
 

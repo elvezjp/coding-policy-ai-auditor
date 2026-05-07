@@ -7,6 +7,20 @@
 フォーマットは [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) に基づいており、
 このプロジェクトは [セマンティックバージョニング](https://semver.org/lang/ja/) に準拠しています。
 
+## [0.5.1] - 2026-05-07
+
+### セキュリティ
+- **[SECURITY] Path Traversal 脆弱性の修正**（[Issue #19](https://github.com/elvezjp/coding-policy-ai-auditor/issues/19)）
+  - `_safe_relative_path` の fallback 処理に欠陥があり、`name` フィールドに含まれる traversal パスがそのまま返されていた問題を修正。`POST /api/static-analysis/analyze` 経由で tmpdir 外への任意ファイル書き込みが可能だった
+  - 多層防御を適用:
+    1. `_safe_relative_path` の fallback で `Path(...).name` によりディレクトリ部分を除去し、空文字列の場合は `unknown_file` にフォールバック
+    2. `_create_temp_files` で `resolve()` 後に `is_relative_to()` による境界チェックを行い、tmpdir を外れる場合は `ValueError` で拒否
+  - API 仕様の変更はなく、正常な相対パスの挙動は従来通り
+  - 注: v0.3 / v0.4 にも同一の欠陥があるが、Dependabot Alert Policy に従い修正対象外
+
+### 注意
+- v0.5.0 との後方互換性あり（正常入力に対する API 仕様・挙動の変更なし）
+
 ## [0.5.0] - 2026-04-16
 
 ### 追加

@@ -42,14 +42,14 @@
 3. 変更に対する**テストを作成**
    ```bash
    # バックエンドのテストを実行
-   cd versions/v0.5/backend
+   cd versions/v0.5.1/backend
    uv run pytest tests/ -v
 
    # カバレッジ付きでテストを実行
    uv run pytest tests/ --cov=app --cov-report=html
 
    # フロントエンドのテストを実行
-   cd versions/v0.5/frontend
+   cd versions/v0.5.1/frontend
    npm test
    ```
 
@@ -87,7 +87,7 @@ git clone https://github.com/YOUR-USERNAME/coding-policy-ai-auditor.git
 cd coding-policy-ai-auditor
 
 # バックエンドの依存関係をインストール
-cd versions/v0.5/backend
+cd versions/v0.5.1/backend
 uv sync
 
 # フロントエンドの依存関係をインストール
@@ -99,7 +99,7 @@ npm install
 
 ```bash
 # バックエンドのテストを実行
-cd versions/v0.5/backend
+cd versions/v0.5.1/backend
 uv run pytest tests/ -v
 
 # 特定のテストファイルを実行
@@ -159,7 +159,7 @@ Closes #123
 ## バージョン管理
 
 貢献する際は：
-- 最新バージョン（`versions/v0.5/`）に焦点を当てる
+- 最新バージョン（`versions/v0.5.1/`）に焦点を当てる
 - 可能な限り後方互換性を維持する
 - 破壊的変更は明確にドキュメント化する
 

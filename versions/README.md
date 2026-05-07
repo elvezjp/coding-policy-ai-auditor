@@ -12,10 +12,14 @@
 
 ```
 versions/
-├── v0.5/               # 最新版
+├── v0.5.1/             # 最新版
 │   ├── frontend/      # フロントエンド全体
 │   ├── backend/       # バックエンド全体
 │   └── spec.md        # 詳細仕様書
+├── v0.5/
+│   ├── frontend/
+│   ├── backend/
+│   └── spec.md
 ├── v0.4/
 │   ├── frontend/
 │   ├── backend/
@@ -34,7 +38,7 @@ versions/
 
 ```bash
 # 1. 最新バージョンディレクトリをコピー
-cp -r versions/v0.5 versions/v0.6
+cp -r versions/v0.5.1 versions/v0.6
 
 # 2. 新バージョンディレクトリで修正を実施
 cd versions/v0.6
@@ -54,26 +58,27 @@ cd versions/v0.6
 
 詳細な変更点は[更新履歴](#更新履歴)を確認してください。
 
-| 機能 / バージョン | v0.1 | v0.3 | v0.4 | v0.5 |
-| :--- | :--- | :--- | :--- | :--- |
-| リリース日 | 2026-01-09 | 2026-01-23 | 2026-01-28 | 2026-04-16 |
-| フロントエンド | Vite + React + TypeScript | Vite + React + TypeScript | Vite + React + TypeScript | Vite + React + TypeScript |
-| バックエンド | FastAPI + Python 3.11+ | FastAPI + Python 3.10+ | FastAPI + Python 3.10+ | FastAPI + Python 3.11+ |
-| Javaファイルアップロード | ✅ | ✅ | ✅ | ✅ |
-| ルールプロンプト管理 | ✅ | ✅ | ✅ | ✅ |
-| リアルタイム進捗表示 | ✅ | ✅ | ✅ | ✅ |
-| 結果フィルタリング | ✅ | ✅ | ✅ | ✅ |
-| Markdownレポート出力 | ✅ | ✅ | ✅ | ✅ |
-| LLMプロバイダー | AWS Bedrock | AWS Bedrock / OpenAI / Anthropic | AWS Bedrock / OpenAI / Anthropic | AWS Bedrock / OpenAI / Anthropic |
-| LLM監査実行 | ⚠️ エラーあり | ✅ | ✅ | ✅ |
-| 静的解析 (Checkstyle/PMD) | ✅ | ✅ | ✅ | ✅ |
-| 静的解析 (Ruff/Flake8/Pylint) | - | ✅ | ✅ | ✅ |
-| 設定ファイルジェネレーター | - | ✅ | ✅ | ✅ |
-| 単体テスト | - | ✅ | ✅ | ✅ |
-| AIオーディター形式Excel | - | - | ✅ | ✅ |
-| 規約選択機能 | - | - | ✅ | ✅ |
-| Windows 静的解析対応 | - | - | - | ✅ |
-| CP932 エンコーディング対応 | - | - | - | ✅ |
+| 機能 / バージョン | v0.1 | v0.3 | v0.4 | v0.5 | v0.5.1 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| リリース日 | 2026-01-09 | 2026-01-23 | 2026-01-28 | 2026-04-16 | 2026-05-07 |
+| フロントエンド | Vite + React + TypeScript | Vite + React + TypeScript | Vite + React + TypeScript | Vite + React + TypeScript | Vite + React + TypeScript |
+| バックエンド | FastAPI + Python 3.11+ | FastAPI + Python 3.10+ | FastAPI + Python 3.10+ | FastAPI + Python 3.11+ | FastAPI + Python 3.11+ |
+| Javaファイルアップロード | ✅ | ✅ | ✅ | ✅ | ✅ |
+| ルールプロンプト管理 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| リアルタイム進捗表示 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| 結果フィルタリング | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Markdownレポート出力 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| LLMプロバイダー | AWS Bedrock | AWS Bedrock / OpenAI / Anthropic | AWS Bedrock / OpenAI / Anthropic | AWS Bedrock / OpenAI / Anthropic | AWS Bedrock / OpenAI / Anthropic |
+| LLM監査実行 | ⚠️ エラーあり | ✅ | ✅ | ✅ | ✅ |
+| 静的解析 (Checkstyle/PMD) | ✅ | ✅ | ✅ | ✅ | ✅ |
+| 静的解析 (Ruff/Flake8/Pylint) | - | ✅ | ✅ | ✅ | ✅ |
+| 設定ファイルジェネレーター | - | ✅ | ✅ | ✅ | ✅ |
+| 単体テスト | - | ✅ | ✅ | ✅ | ✅ |
+| AIオーディター形式Excel | - | - | ✅ | ✅ | ✅ |
+| 規約選択機能 | - | - | ✅ | ✅ | ✅ |
+| Windows 静的解析対応 | - | - | - | ✅ | ✅ |
+| CP932 エンコーディング対応 | - | - | - | ✅ | ✅ |
+| Path Traversal 脆弱性修正 (#19) | - | ⚠️ 影響あり | ⚠️ 影響あり | ⚠️ 影響あり | ✅ |
 
 **凡例**: ✅ 実装済み / ⚠️ 問題あり / - 未実装
 
@@ -81,7 +86,21 @@ cd versions/v0.6
 
 ## 更新履歴
 
-### v0.5 (最新)
+### v0.5.1 (最新, 2026-05-07)
+
+**Path Traversal 脆弱性修正版**
+
+- **バックエンド**
+  - `_safe_relative_path` の fallback で `Path(...).name` によりディレクトリ部分を除去（[Issue #19](https://github.com/elvezjp/coding-policy-ai-auditor/issues/19)）
+  - `_create_temp_files` で `resolve()` 後に `is_relative_to()` による境界チェックを追加し、tmpdir 外への書き込みを `ValueError` で拒否
+
+- **注意事項**
+  - v0.5.0 との後方互換性あり（API 仕様・正常入力に対する挙動の変更なし）
+  - v0.3 / v0.4 にも同一の欠陥があるが、Dependabot Alert Policy に従い修正対象外
+
+---
+
+### v0.5
 
 **Windows対応・テスト安定化版**
 

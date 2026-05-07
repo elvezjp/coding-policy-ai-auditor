@@ -67,7 +67,7 @@ https://github.com/user-attachments/assets/01b8fe08-861b-473a-8f1a-f4de00f751f4
 ### 2. フロントエンドを起動する
 
 ```bash
-cd versions/v0.5/frontend
+cd versions/v0.5.1/frontend
 npm install
 npm run dev
 ```
@@ -77,7 +77,7 @@ npm run dev
 ### 3. バックエンドを起動する
 
 ```bash
-cd versions/v0.5/backend
+cd versions/v0.5.1/backend
 
 # 環境変数を設定
 cp .env.example .env
@@ -115,10 +115,10 @@ CORS_ORIGINS=http://localhost:5173
 
 ```bash
 # フロントエンドを起動（ターミナル1）
-cd versions/v0.5/frontend && npm run dev
+cd versions/v0.5.1/frontend && npm run dev
 
 # バックエンドを起動（ターミナル2）
-cd versions/v0.5/backend && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+cd versions/v0.5.1/backend && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 # ブラウザで http://localhost:5173 にアクセス
 ```
@@ -144,10 +144,11 @@ coding-policy-ai-auditor/
 ├── docs/
 │   └── ai-auditor-format/  # AIオーディター形式サンプルファイル
 ├── versions/
-│   ├── v0.5/               # 最新版（推奨）
+│   ├── v0.5.1/             # 最新版（推奨）
 │   │   ├── frontend/       # フロントエンドアプリケーション
 │   │   ├── backend/        # バックエンドアプリケーション
 │   │   └── spec.md         # 詳細仕様書
+│   ├── v0.5/               # 旧バージョン
 │   ├── v0.4/               # 旧バージョン
 │   └── v0.3/
 └── ...
@@ -225,7 +226,7 @@ uv sync --extra flake8
 
 ## ドキュメント
 
-- [詳細仕様書](versions/v0.5/spec.md) - v0.5 仕様書
+- [詳細仕様書](versions/v0.5.1/spec.md) - v0.5.1 仕様書
 - [CHANGELOG.md](CHANGELOG.md) - バージョン履歴
 - [CONTRIBUTING.md](CONTRIBUTING.md) - コントリビューション方法
 - [SECURITY.md](SECURITY.md) - セキュリティポリシー
@@ -241,7 +242,7 @@ uv sync --extra flake8
 
 ### Dependabot アラートの運用方針
 
-本リポジトリは過去のリリースを `versions/` 配下にアーカイブしており（現在は `v0.3`, `v0.4`, `v0.5`）、それらのロックファイルに対しても Dependabot アラートが発報されます。また、`add-line-numbers/` と `excel2md/` は git subtree で取り込んでおり、依存関係は元リポジトリ側で管理されています。これらを踏まえ、Dependabot アラートは以下のとおり運用します。
+本リポジトリは過去のリリースを `versions/` 配下にアーカイブしており（現在は `v0.3`, `v0.4`, `v0.5`, `v0.5.1`）、それらのロックファイルに対しても Dependabot アラートが発報されます。また、`add-line-numbers/` と `excel2md/` は git subtree で取り込んでおり、依存関係は元リポジトリ側で管理されています。これらを踏まえ、Dependabot アラートは以下のとおり運用します。
 
 #### Malware タブ
 
@@ -252,8 +253,8 @@ uv sync --extra flake8
 
 | 対象 | 対応 |
 |------|------|
-| 最新バージョン（現在は `versions/v0.5/`） | **修正対応する**（依存更新／PR 作成） |
-| 旧バージョン（`versions/v0.3/`, `versions/v0.4/`） | **Dismiss**。既存分は一括 close、新規発生時は影響を確認のうえ close |
+| 最新バージョン（現在は `versions/v0.5.1/`） | **修正対応する**（依存更新／PR 作成） |
+| 旧バージョン（`versions/v0.3/`, `versions/v0.4/`, `versions/v0.5/`） | **Dismiss**。既存分は一括 close、新規発生時は影響を確認のうえ close |
 | git subtree ディレクトリ（`add-line-numbers/`, `excel2md/`） | **Dismiss**。subtree 元リポジトリ側で管理されているため、本リポジトリでは修正対象外 |
 
 #### 運用フロー
