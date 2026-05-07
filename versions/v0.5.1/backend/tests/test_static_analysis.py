@@ -391,6 +391,26 @@ class TestSafeRelativePath:
         )
         assert result == Path("unknown_file")
 
+    def test_leading_slash_path_falls_back_even_when_not_absolute(self):
+        """先頭スラッシュ系のパス (Windows での drive-relative) も fallback すること"""
+        from pathlib import Path
+
+        # POSIX では is_absolute() が True、Windows では False になるが
+        # いずれの環境でも fallback が発動して basename のみが返るべき
+        result = self._runner()._safe_relative_path(
+            {"path": "/etc/passwd", "name": "passwd"}
+        )
+        assert result == Path("passwd")
+
+    def test_leading_backslash_path_falls_back(self):
+        """先頭バックスラッシュ系のパスも fallback すること"""
+        from pathlib import Path
+
+        result = self._runner()._safe_relative_path(
+            {"path": "\\Windows\\System32\\evil.py", "name": "evil.py"}
+        )
+        assert result == Path("evil.py")
+
 
 class TestCreateTempFilesPathTraversal:
     """_create_temp_files の Path Traversal 防御テスト (issue #19)"""

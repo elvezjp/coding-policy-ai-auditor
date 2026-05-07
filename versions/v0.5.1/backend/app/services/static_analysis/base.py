@@ -88,7 +88,11 @@ class ToolRunner(ABC):
         """パストラバーサル攻撃を防止した相対パスを取得"""
         file_path = file_data.get("path") or file_data.get("name", "")
         candidate = Path(file_path)
-        if candidate.is_absolute() or ".." in candidate.parts:
+        # Windows では Path("/etc/passwd").is_absolute() が False になるが、
+        # tmpdir と join すると drive-relative で親ディレクトリへ抜けられるため、
+        # 先頭スラッシュ系の root prefix も明示的に検出する
+        has_root_prefix = file_path.startswith(("/", "\\"))
+        if candidate.is_absolute() or has_root_prefix or ".." in candidate.parts:
             # fallback でも name フィールドのディレクトリ部分を除去して
             # 末端ファイル名のみを採用する (issue #19)
             name_only = Path(file_data.get("name", "")).name
