@@ -1,0 +1,39 @@
+# Pylint デフォルト設定
+# AI-Auditor静的解析用
+
+[MAIN]
+py-version = 3.11
+jobs = 1
+fail-under = 0
+
+[MESSAGES CONTROL]
+disable =
+    C0114,  # missing-module-docstring
+    C0115,  # missing-class-docstring
+    C0116,  # missing-function-docstring
+    R0903,  # too-few-public-methods
+    R0913,  # too-many-arguments
+    W0511,  # fixme
+
+[FORMAT]
+max-line-length = 120
+max-module-lines = 2000
+
+[DESIGN]
+max-args = 10
+max-locals = 20
+max-returns = 10
+max-branches = 15
+max-statements = 100
+max-attributes = 15
+min-public-methods = 0
+max-public-methods = 30
+
+[BASIC]
+good-names = i, j, k, ex, _, f, e, id, db
+
+[SIMILARITIES]
+min-similarity-lines = 10
+ignore-comments = yes
+ignore-docstrings = yes
+ignore-imports = yes
