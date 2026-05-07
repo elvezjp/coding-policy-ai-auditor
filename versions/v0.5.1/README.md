@@ -4,6 +4,19 @@
 
 ---
 
+## v0.5.1 リリースノート（2026-05-07）
+
+### Security
+
+- **[SECURITY] Path Traversal 脆弱性の修正**（[Issue #19](https://github.com/elvezjp/coding-policy-ai-auditor/issues/19)）
+  - `_safe_relative_path` の fallback 処理に欠陥があり、`name` フィールドに `..` を含む値が渡された際に traversal パスがそのまま返されていた問題を修正
+  - 多層防御として、(1) fallback で `Path(...).name` によりディレクトリ部分を除去、(2) `_create_temp_files` で resolve 後に tmpdir 配下に収まるかを境界チェックする処理を追加
+  - 影響範囲はバックエンドの内部メソッドのみで、API 仕様および正常系の挙動に変更はない
+
+詳細はルートの [CHANGELOG.md](../../CHANGELOG.md) を参照してください。
+
+---
+
 ## 目的
 
 - 判断系ルール（意味的・主観的な規約）について、レビューの手間を減らしつつ漏れを減らす
