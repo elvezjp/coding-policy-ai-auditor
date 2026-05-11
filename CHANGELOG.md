@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.5.1] - 2026-05-07
+## [0.5.1] - 2026-05-11
 
 ### Security
 - **[SECURITY] Path Traversal vulnerability fix** ([Issue #19](https://github.com/elvezjp/coding-policy-ai-auditor/issues/19))
@@ -17,6 +17,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     2. `_create_temp_files` now performs a post-`resolve()` boundary check with `is_relative_to()` and raises `ValueError` if the resolved path escapes `tmpdir`
   - No API contract changes; legitimate paths behave as before
   - Note: v0.3 and v0.4 share the same flaw but are out of scope per the Dependabot Alert Policy
+
+### Changed
+- **excel2md subtree updated from v2.0 → v2.1.1** ([Issue #21](https://github.com/elvezjp/coding-policy-ai-auditor/issues/21))
+  - `versions/v0.5.1/backend/app/markdown_tools/excel2md_tool.py` now references `excel2md/v2.1.1/`
+  - Inherits the following upstream fixes:
+    - **v2.0.1**: Fixed `NameError` in heuristic Mermaid detection caused by a missing `is_code_block` import
+    - **v2.1.0**: Bumped bundled test-time dependencies — pytest 9.0.3 ([CVE-2025-71176](https://github.com/advisories/GHSA-6w46-j5rx-g56g)) and Pygments 2.20.0 ([CVE-2026-4539](https://github.com/advisories/GHSA-5239-wwwm-4pmq))
+    - **v2.1.1**: Restored v1.x backward-compatible re-exports (`is_code_block`, `build_code_block_from_rows`); fixed tuple-arity mismatch on the `max_cells_per_table` truncation path; fixed duplicated and dropped footnote numbering across multiple tables
+  - Note: upstream raised its minimum Python to 3.10 in v2.1.0, which is already covered by v0.5's `requires-python = ">=3.11"`
 
 ### Note
 - Backward compatible with v0.5.0 (no API or behavioral change for legitimate inputs)
@@ -98,7 +107,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Key Features |
 |---------|-------------|
-| 0.5.1   | Path Traversal vulnerability fix |
+| 0.5.1   | Path Traversal vulnerability fix, excel2md subtree updated to v2.1.1 |
 | 0.5.0   | Windows static analysis support, CP932 encoding support, test stabilization |
 | 0.4.0   | AI Auditor format Excel support, policy selection feature |
 | 0.3.0   | Multi-LLM support, static analysis (Java+Python), config generator |
@@ -123,5 +132,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | Windows static analysis | ✅ | ✅ | ❌ | ❌ | ❌ |
 | CP932 encoding support | ✅ | ✅ | ❌ | ❌ | ❌ |
 | Path Traversal vulnerability fix (#19) | ✅ | ⚠️ | ⚠️ | ⚠️ | - |
+| excel2md subtree version | v2.1.1 | v2.0 | v2.0 | v2.0 | - |
 
 **Legend**: ✅ Implemented / ⚠️ Has issues / ❌ Not implemented

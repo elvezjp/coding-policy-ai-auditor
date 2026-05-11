@@ -7,7 +7,7 @@
 フォーマットは [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) に基づいており、
 このプロジェクトは [セマンティックバージョニング](https://semver.org/lang/ja/) に準拠しています。
 
-## [0.5.1] - 2026-05-07
+## [0.5.1] - 2026-05-11
 
 ### セキュリティ
 - **[SECURITY] Path Traversal 脆弱性の修正**（[Issue #19](https://github.com/elvezjp/coding-policy-ai-auditor/issues/19)）
@@ -17,6 +17,15 @@
     2. `_create_temp_files` で `resolve()` 後に `is_relative_to()` による境界チェックを行い、tmpdir を外れる場合は `ValueError` で拒否
   - API 仕様の変更はなく、正常な相対パスの挙動は従来通り
   - 注: v0.3 / v0.4 にも同一の欠陥があるが、Dependabot Alert Policy に従い修正対象外
+
+### 変更
+- **excel2md subtree を v2.0 → v2.1.1 に更新**（[Issue #21](https://github.com/elvezjp/coding-policy-ai-auditor/issues/21)）
+  - `versions/v0.5.1/backend/app/markdown_tools/excel2md_tool.py` の参照先を `excel2md/v2.1.1/` に変更
+  - 以下の upstream 修正を取り込み:
+    - **v2.0.1**: heuristic Mermaid 検出時に `is_code_block` の import 漏れで発生していた `NameError` を修正
+    - **v2.1.0**: 同梱の test-time 依存を更新 — pytest 9.0.3（[CVE-2025-71176](https://github.com/advisories/GHSA-6w46-j5rx-g56g)）、Pygments 2.20.0（[CVE-2026-4539](https://github.com/advisories/GHSA-5239-wwwm-4pmq)）
+    - **v2.1.1**: v1.x 後方互換の再エクスポート（`is_code_block` / `build_code_block_from_rows`）を復元、`max_cells_per_table` truncation 経路の tuple arity 不整合を修正、複数テーブル間の脚注番号重複・脱落を修正
+  - 注: upstream は v2.1.0 で最低 Python を 3.10 に引き上げ済みだが、v0.5 の `requires-python = ">=3.11"` で既にカバー済み
 
 ### 注意
 - v0.5.0 との後方互換性あり（正常入力に対する API 仕様・挙動の変更なし）
@@ -98,7 +107,7 @@
 
 | バージョン | 主な機能 |
 |------------|----------|
-| 0.5.1      | Path Traversal 脆弱性の修正 |
+| 0.5.1      | Path Traversal 脆弱性の修正、excel2md subtree を v2.1.1 に更新 |
 | 0.5.0      | Windows静的解析対応、CP932エンコーディング対応、テスト安定化 |
 | 0.4.0      | AIオーディター形式Excel対応、規約選択機能 |
 | 0.3.0      | マルチLLM対応、静的解析（Java+Python）、設定ジェネレーター |
@@ -123,5 +132,6 @@
 | Windows 静的解析対応 | ✅ | ✅ | ❌ | ❌ | ❌ |
 | CP932 エンコーディング対応 | ✅ | ✅ | ❌ | ❌ | ❌ |
 | Path Traversal 脆弱性修正 (#19) | ✅ | ⚠️ | ⚠️ | ⚠️ | - |
+| excel2md subtree バージョン | v2.1.1 | v2.0 | v2.0 | v2.0 | - |
 
 **凡例**: ✅ 実装済み / ⚠️ 問題あり / ❌ 未実装
