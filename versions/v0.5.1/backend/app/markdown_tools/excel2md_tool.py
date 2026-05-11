@@ -13,7 +13,7 @@ from .base import MarkdownTool
 _DEFAULT_EXCEL2MD_PATH = (
     Path(__file__).resolve().parent.parent.parent.parent.parent.parent
     / "excel2md"
-    / "v2.0"
+    / "v2.1.1"
 )
 EXCEL2MD_PATH = Path(
     os.environ.get("EXCEL2MD_PATH", str(_DEFAULT_EXCEL2MD_PATH))
