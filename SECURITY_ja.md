@@ -8,9 +8,11 @@
 
 | バージョン | サポート状況       |
 | ---------- | ------------------ |
-| 0.5.x      | :white_check_mark: |
+| 0.5.1      | :white_check_mark: |
 | 0.4.x      | :white_check_mark: |
 | < 0.4      | :x:                |
+
+> **Note**: 0.5.0 には Path Traversal 脆弱性（[Issue #19](https://github.com/elvezjp/coding-policy-ai-auditor/issues/19)）があり、0.5.1 で置き換えられました。0.5.0 をご利用中の方は 0.5.1 へのアップグレードを推奨します。
 
 ## 脆弱性の報告
 

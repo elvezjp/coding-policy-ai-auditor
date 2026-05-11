@@ -8,9 +8,11 @@ The latest version is supported:
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 0.5.x   | :white_check_mark: |
+| 0.5.1   | :white_check_mark: |
 | 0.4.x   | :white_check_mark: |
 | < 0.4   | :x:                |
+
+> **Note**: 0.5.0 contained a Path Traversal vulnerability ([Issue #19](https://github.com/elvezjp/coding-policy-ai-auditor/issues/19)) and has been superseded by 0.5.1. Users on 0.5.0 should upgrade to 0.5.1.
 
 ## Reporting a Vulnerability
 

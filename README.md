@@ -67,7 +67,7 @@ Please install the following tools in advance.
 ### 2. Start the Frontend
 
 ```bash
-cd versions/v0.5/frontend
+cd versions/v0.5.1/frontend
 npm install
 npm run dev
 ```
@@ -77,7 +77,7 @@ Access the web application at `http://localhost:5173` in your browser.
 ### 3. Start the Backend
 
 ```bash
-cd versions/v0.5/backend
+cd versions/v0.5.1/backend
 
 # Set environment variables
 cp .env.example .env
@@ -115,10 +115,10 @@ CORS_ORIGINS=http://localhost:5173
 
 ```bash
 # Start frontend (Terminal 1)
-cd versions/v0.5/frontend && npm run dev
+cd versions/v0.5.1/frontend && npm run dev
 
 # Start backend (Terminal 2)
-cd versions/v0.5/backend && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+cd versions/v0.5.1/backend && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 # Access http://localhost:5173 in your browser
 ```
@@ -144,10 +144,11 @@ coding-policy-ai-auditor/
 ├── docs/
 │   └── ai-auditor-format/  # AI Auditor format sample files
 ├── versions/
-│   ├── v0.5/               # Latest version (recommended)
+│   ├── v0.5.1/             # Latest version (recommended)
 │   │   ├── frontend/       # Frontend application
 │   │   ├── backend/        # Backend application
 │   │   └── spec.md         # Detailed specification
+│   ├── v0.5/               # Previous version
 │   ├── v0.4/               # Previous version
 │   └── v0.3/
 └── ...
@@ -226,7 +227,7 @@ uv sync --extra flake8
 
 ## Documentation
 
-- [Detailed Specification](versions/v0.5/spec.md) - v0.5 specification document
+- [Detailed Specification](versions/v0.5.1/spec.md) - v0.5.1 specification document
 - [CHANGELOG.md](CHANGELOG.md) - Version history
 - [CONTRIBUTING.md](CONTRIBUTING.md) - How to contribute
 - [SECURITY.md](SECURITY.md) - Security policy
@@ -242,7 +243,7 @@ For details, see [SECURITY.md](SECURITY.md).
 
 ### Dependabot Alert Policy
 
-This repository keeps past releases archived under `versions/` (currently `v0.3`, `v0.4`, `v0.5`), so Dependabot alerts are also raised against their lockfiles. In addition, `add-line-numbers/` and `excel2md/` are pulled in via git subtree and their dependencies are managed in the upstream repositories. Given this, we operate Dependabot alerts as follows.
+This repository keeps past releases archived under `versions/` (currently `v0.3`, `v0.4`, `v0.5`, `v0.5.1`), so Dependabot alerts are also raised against their lockfiles. In addition, `add-line-numbers/` and `excel2md/` are pulled in via git subtree and their dependencies are managed in the upstream repositories. Given this, we operate Dependabot alerts as follows.
 
 #### Malware tab
 
@@ -253,8 +254,8 @@ This repository keeps past releases archived under `versions/` (currently `v0.3`
 
 | Target | Action |
 |--------|--------|
-| The latest version (currently `versions/v0.5/`) | **Fix** (dependency update / PR) |
-| Older versions (`versions/v0.3/`, `versions/v0.4/`) | **Dismiss**. Bulk-close existing alerts and dismiss new ones after confirming no impact |
+| The latest version (currently `versions/v0.5.1/`) | **Fix** (dependency update / PR) |
+| Older versions (`versions/v0.3/`, `versions/v0.4/`, `versions/v0.5/`) | **Dismiss**. Bulk-close existing alerts and dismiss new ones after confirming no impact |
 | git subtree directories (`add-line-numbers/`, `excel2md/`) | **Dismiss**. Managed in the upstream subtree repositories |
 
 #### Workflow
