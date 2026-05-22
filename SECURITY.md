@@ -140,8 +140,9 @@ This repository keeps past releases archived under `versions/`, which means Depe
 | Target | Action |
 |--------|--------|
 | The latest version | **Fix** (dependency update / PR) |
-| Older versions (under `versions/`) | **Dismiss**. Bulk-close existing alerts and dismiss new ones after confirming no impact |
-| git subtree directories (`add-line-numbers/`, `excel2md/`) | **Dismiss**. Managed in the upstream subtree repositories |
+| Older versions (under `versions/`) | **Dismiss**. Review impact on new occurrences and close |
+| git subtree directories (`add-line-numbers/`) | **Dismiss**. Fix in the upstream subtree repository, then sync to this repository |
+| git subtree directories (`excel2md/`) | **Dismiss**. Used only in older versions; review impact and close |
 
 A dismissed alert will not reappear for the same combination of manifest × package × CVE, but a new CVE published for the same package will be raised as a new alert.
 

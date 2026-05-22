@@ -140,8 +140,9 @@ coding-policy-ai-auditor には以下のセキュリティ対策が含まれて�
 | 対象 | 対応 |
 |------|------|
 | 最新バージョン | **修正対応**（依存更新／PR作成） |
-| 旧バージョン（`versions/` 配下） | **Dismiss**。既存分は一括close、新規発生時は影響を確認のうえclose |
-| git subtree 配下（`add-line-numbers/`、`excel2md/`） | **Dismiss**。subtree 元リポジトリ側で管理 |
+| 旧バージョン（`versions/` 配下） | **Dismiss**。新規発生時は影響を確認のうえclose |
+| git subtree 配下（`add-line-numbers/`） | **Dismiss**。subtree 元リポジトリ側で修正後、本リポジトリに同期する |
+| git subtree 配下（`excel2md/`） | **Dismiss**。旧バージョンでしか使われないため、影響を確認のうえclose |
 
 Dismiss したアラートは「同一 manifest × 同一パッケージ × 同一 CVE」の組み合わせでは再発生しませんが、同じパッケージに別の CVE が公開された場合は新規アラートとして再通知されます。
 
