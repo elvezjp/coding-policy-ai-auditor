@@ -129,30 +129,19 @@ coding-policy-ai-auditor には以下のセキュリティ対策が含まれて�
 
 これらの依存関係のセキュリティアドバイザリを監視し、必要に応じて更新しています。
 
-## Dependabot アラートの運用方針
+### Dependabot アラートの運用方針
 
 本リポジトリは旧バージョンのコードを `versions/` 配下にアーカイブとして保持しているため、それらの lockfile に対しても Dependabot アラートが発生します。また、`add-line-numbers/`、`excel2md/` は git subtree で取り込んでおり、依存管理は各 subtree 元リポジトリ側で行います。これらを踏まえ、本リポジトリでは以下の方針で Dependabot アラートを運用します。
 
-### Malware タブ
+**Malware タブ**: 発生場所を問わず必ず修正対応する
 
-- **発生場所を問わず必ず修正対応する**
-- 旧バージョン・git subtree 配下であってもマルウェアは放置しない
-
-### Vulnerable タブ
+**Vulnerable**: 以下の表に従う
 
 | 対象 | 対応 |
 |------|------|
 | 最新バージョン | **修正対応**（依存更新／PR作成） |
 | 旧バージョン（`versions/` 配下） | **Dismiss**。既存分は一括close、新規発生時は影響を確認のうえclose |
 | git subtree 配下（`add-line-numbers/`、`excel2md/`） | **Dismiss**。subtree 元リポジトリ側で管理 |
-
-### 運用フロー
-
-1. 新規アラート発生時、**Malware** タブか **Vulnerable** タブかを確認
-2. **Malware** → 場所を問わず修正
-3. **Vulnerable** → 発生場所を確認
-   - 最新バージョン → 修正対応
-   - 旧バージョン or git subtree 配下 → 影響なしを確認のうえ Dismiss
 
 Dismiss したアラートは「同一 manifest × 同一パッケージ × 同一 CVE」の組み合わせでは再発生しませんが、同じパッケージに別の CVE が公開された場合は新規アラートとして再通知されます。
 
