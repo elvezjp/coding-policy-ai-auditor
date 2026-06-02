@@ -32,11 +32,9 @@ export default defineConfig(({ mode }) => {
       setupFiles: ['./src/__tests__/setup.ts'],
       include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
       pool: 'forks',
-      poolOptions: {
-        forks: {
-          singleFork: true,
-        },
-      },
+      // Vitest 4: poolOptions was removed. singleFork → fileParallelism: false
+      // (run all test files serially in a single worker).
+      fileParallelism: false,
     },
   }
 })
