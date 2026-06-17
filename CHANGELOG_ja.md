@@ -7,9 +7,10 @@
 フォーマットは [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) に基づいており、
 このプロジェクトは [セマンティックバージョニング](https://semver.org/lang/ja/) に準拠しています。
 
-## [0.5.1] - 2026-05-11
+## [0.5.1] - 2026-06-17
 
 ### セキュリティ
+- **[SECURITY] `starlette` を 1.0.1 → 1.3.1 に更新**: Dependabot アラート [#162](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/162) / [#163](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/163) / [#164](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/164) / [#165](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/165)（`starlette < 1.3.1` ほか）を解消。あわせて `uv.lock` を再生成。
 - **[SECURITY] Path Traversal 脆弱性の修正**（[Issue #19](https://github.com/elvezjp/coding-policy-ai-auditor/issues/19)）
   - `_safe_relative_path` の fallback 処理に欠陥があり、`name` フィールドに含まれる traversal パスがそのまま返されていた問題を修正。`POST /api/static-analysis/analyze` 経由で tmpdir 外への任意ファイル書き込みが可能だった
   - 多層防御を適用:
