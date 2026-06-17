@@ -7,10 +7,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.5.1] - 2026-06-17
+## [Unreleased]
 
 ### Security
 - **[SECURITY] Bumped `starlette` from 1.0.1 to 1.3.1** to resolve Dependabot alerts [#162](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/162) / [#163](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/163) / [#164](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/164) / [#165](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/165) (`starlette < 1.3.1` and related). Also regenerated `uv.lock`.
+
+## [0.5.1] - 2026-05-11
+
+### Security
 - **[SECURITY] Path Traversal vulnerability fix** ([Issue #19](https://github.com/elvezjp/coding-policy-ai-auditor/issues/19))
   - Fixed a flaw in the `_safe_relative_path` fallback that allowed traversal paths in the `name` field to be returned as-is, enabling arbitrary file writes outside the intended temp directory via `POST /api/static-analysis/analyze`
   - Applied two-layer defense:
