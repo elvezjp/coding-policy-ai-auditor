@@ -6,6 +6,7 @@ import tempfile
 from pathlib import Path
 
 from .base import MarkdownTool
+from ..safe_path import safe_filename
 
 # excel2mdモジュールへのパス（環境変数でオーバーライド可能）
 # パス構造: excel2md_tool.py -> markdown_tools -> app -> backend -> v0.5.0 -> versions -> repo_root
@@ -52,7 +53,7 @@ class Excel2mdTool(MarkdownTool):
                 tmpdir_path = Path(tmpdir)
 
                 # 入力ファイルを作成
-                input_path = tmpdir_path / filename
+                input_path = tmpdir_path / safe_filename(filename)
                 input_path.write_bytes(file_content)
 
                 # 出力パスを設定（run()がファイルを生成する）
