@@ -7,10 +7,12 @@
 フォーマットは [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) に基づいており、
 このプロジェクトは [セマンティックバージョニング](https://semver.org/lang/ja/) に準拠しています。
 
-## [Unreleased]
+## [0.6.0] - Unreleased
 
 ### セキュリティ
 - **[SECURITY] `starlette` を 1.0.1 → 1.3.1 に更新**: Dependabot アラート [#162](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/162) / [#163](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/163) / [#164](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/164) / [#165](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/165)（`starlette < 1.3.1` ほか）を解消。あわせて `uv.lock` を再生成。
+- **[SECURITY] 認証なし Excel 変換 API のパストラバーサルによる任意ファイル書き込みを修正**（GHSA-ghvr-jjv7-mx45）: `POST /api/convert/excel-to-markdown`（`excel2md_tool.py` / `excel2md_mermaid_tool.py`）がクライアント指定のアップロードファイル名を一時ディレクトリのパスへそのまま結合していたため、絶対パスや `../` を含む値で一時ディレクトリ外にファイルを作成・上書きできた。クライアント由来のファイル名は `safe_filename()`（`versions/v0.5.1/backend/app/safe_path.py` に追加）でディレクトリ成分を除去してから使用するよう修正し、回帰テストを追加。注: `versions/v0.3` / `versions/v0.4` / `versions/v0.5` にも同一の欠陥があるが、Dependabot Alert Policy に従い修正対象外（`versions/` レイアウトは廃止予定）
+- **[SECURITY] フロントエンド依存関係を更新し Dependabot アラートを解消**（#32）: `react-router-dom` を 7.17.0 → 7.18.2 に更新してアラート [#192](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/192) / [#204](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/204) / [#210](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/210) / [#212](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/212)（XSS、ルートマッチング DoS、コンストラクタインジェクション、オープンリダイレクト）を解消。あわせて推移的な開発依存 `js-yaml` 4.2.0 → 4.3.0（アラート [#199](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/199)）と `brace-expansion` → 1.1.16 / 5.0.8（アラート [#186](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/186)、いずれも CPU 消費型 DoS）を更新し、`postcss` も 8.5.15 → 8.5.24 に先行更新（GHSA-r28c-9q8g-f849、任意 `.map` ファイル漏えい）。アラート [#200](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/200)（GHSA-qwww-vcr4-c8h2、RSC モードの CSRF）は unstable RSC API 未使用かつ 7.x 系修正版が存在しないため「該当機能未使用」として dismiss
 
 ## [0.5.1] - 2026-05-11
 
