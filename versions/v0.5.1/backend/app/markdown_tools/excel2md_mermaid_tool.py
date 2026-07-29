@@ -5,6 +5,7 @@ import tempfile
 from pathlib import Path
 
 from .base import MarkdownTool
+from ..safe_path import safe_filename
 
 # excel2mdモジュールへのパスはexcel2md_tool.pyで一元管理
 from .excel2md_tool import EXCEL2MD_PATH
@@ -43,7 +44,7 @@ class Excel2mdMermaidTool(MarkdownTool):
                 tmpdir_path = Path(tmpdir)
 
                 # 入力ファイルを作成
-                input_path = tmpdir_path / filename
+                input_path = tmpdir_path / safe_filename(filename)
                 input_path.write_bytes(file_content)
 
                 # 出力パスを設定（run()がファイルを生成する）
