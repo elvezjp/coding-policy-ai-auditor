@@ -30,11 +30,22 @@ app = FastAPI(
 # 本番環境では CORS_ORIGINS=https://example.com を設定
 cors_origins_str = os.getenv("CORS_ORIGINS", "*")
 cors_origins = ["*"] if cors_origins_str == "*" else [o.strip() for o in cors_origins_str.split(",")]
+# オリジンを限定していない状態で認証情報を許可すると、Starlette は
+# Access-Control-Allow-Origin にリクエスト元の Origin をそのまま返す
+# （ワイルドカードと認証情報は併用できない仕様のため）。結果として
+# 任意のサイトがこの API へ資格情報付きで到達し、応答を読めてしまう。
+# ローカル起動中に利用者が悪意あるページを開くと、レビュー対象の
+# コードや設計書が読み取られうるため、全許可のときは認証情報を許可しない。
+# Starlette は "*" がリストに含まれるかどうかで全許可を判定するため
+# （allow_all_origins = "*" in allow_origins）、こちらも同じ条件で判定する。
+# CORS_ORIGINS="https://app.example.com,*" のようにワイルドカードが
+# 混在する設定でも全許可扱いになる点に注意。
+allow_credentials = "*" not in cors_origins
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins,
-    allow_credentials=True,
+    allow_credentials=allow_credentials,
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
