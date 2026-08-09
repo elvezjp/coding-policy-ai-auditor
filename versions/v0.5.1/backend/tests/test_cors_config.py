@@ -42,6 +42,26 @@ class TestCorsCredentials:
         assert allow_origin != EVIL_ORIGIN
         assert allow_origin in (None, "*")
 
+    def test_wildcard_in_list_does_not_allow_credentials(self, monkeypatch):
+        """ワイルドカード混在時も認証情報を許可しない。
+
+        Starlette は "*" がリストに含まれれば全許可と判定するため、
+        限定オリジンと "*" が併記された設定も全許可として扱う必要がある。
+        """
+        client = TestClient(_load_app(monkeypatch, "https://app.example.com,*"))
+        res = client.get("/health", headers={"Origin": EVIL_ORIGIN})
+
+        assert res.headers.get("access-control-allow-credentials") is None
+
+    def test_wildcard_in_list_does_not_echo_arbitrary_origin(self, monkeypatch):
+        """ワイルドカード混在時に任意 Origin をそのまま返さない。"""
+        client = TestClient(_load_app(monkeypatch, "https://app.example.com,*"))
+        res = client.get("/health", headers={"Origin": EVIL_ORIGIN})
+
+        allow_origin = res.headers.get("access-control-allow-origin")
+        assert allow_origin != EVIL_ORIGIN
+        assert allow_origin in (None, "*")
+
     def test_explicit_origin_still_allows_credentials(self, monkeypatch):
         """オリジンを限定していれば認証情報を許可する（既存挙動を維持）。"""
         allowed = "https://app.example.com"

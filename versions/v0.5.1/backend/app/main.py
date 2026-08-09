@@ -36,7 +36,11 @@ cors_origins = ["*"] if cors_origins_str == "*" else [o.strip() for o in cors_or
 # 任意のサイトがこの API へ資格情報付きで到達し、応答を読めてしまう。
 # ローカル起動中に利用者が悪意あるページを開くと、レビュー対象の
 # コードや設計書が読み取られうるため、全許可のときは認証情報を許可しない。
-allow_credentials = cors_origins != ["*"]
+# Starlette は "*" がリストに含まれるかどうかで全許可を判定するため
+# （allow_all_origins = "*" in allow_origins）、こちらも同じ条件で判定する。
+# CORS_ORIGINS="https://app.example.com,*" のようにワイルドカードが
+# 混在する設定でも全許可扱いになる点に注意。
+allow_credentials = "*" not in cors_origins
 
 app.add_middleware(
     CORSMiddleware,
