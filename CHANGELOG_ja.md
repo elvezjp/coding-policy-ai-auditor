@@ -10,6 +10,7 @@
 ## [0.6.0] - Unreleased
 
 ### セキュリティ
+- **フロントエンド開発依存の `browserslist` を 4.28.2 → 4.28.9 に更新**: 信頼できないカスタム統計JSONによるクラッシュ／プロトタイプへの書き込み（GHSA-73wf-gq98-2v4g、Dependabot [#273](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/273)）に対応。現行版のロックファイルと関連する5つの依存パッケージを更新。
 - **フロントエンド開発依存の `js-yaml` を 4.3.0 → 4.3.2 に更新**: `!!omap` の処理による過剰な CPU 消費（GHSA-5p4m-2wfm-xmqj、Dependabot [#251](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/251)）に対応。現行版のロックファイルを更新。
 - **[SECURITY] `starlette` を 1.0.1 → 1.3.1 に更新**: Dependabot アラート [#162](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/162) / [#163](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/163) / [#164](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/164) / [#165](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/165)（`starlette < 1.3.1` ほか）を解消。あわせて `uv.lock` を再生成。
 - **[SECURITY] 認証なし Excel 変換 API のパストラバーサルによる任意ファイル書き込みを修正**（GHSA-ghvr-jjv7-mx45）: `POST /api/convert/excel-to-markdown`（`excel2md_tool.py` / `excel2md_mermaid_tool.py`）がクライアント指定のアップロードファイル名を一時ディレクトリのパスへそのまま結合していたため、絶対パスや `../` を含む値で一時ディレクトリ外にファイルを作成・上書きできた。クライアント由来のファイル名は `safe_filename()`（`versions/v0.5.1/backend/app/safe_path.py` に追加）でディレクトリ成分を除去してから使用するよう修正し、回帰テストを追加。注: `versions/v0.3` / `versions/v0.4` / `versions/v0.5` にも同一の欠陥があるが、Dependabot Alert Policy に従い修正対象外（`versions/` レイアウトは廃止予定）
