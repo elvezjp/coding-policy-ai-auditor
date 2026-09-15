@@ -10,6 +10,7 @@
 ## [0.6.0] - Unreleased
 
 ### セキュリティ
+- **フロントエンド開発依存の `vitest` を 4.1.9 → 4.1.11 に更新**: `@vitest/mocker` のリダイレクトモックを経由したパストラバーサル／任意ファイル読み取り（GHSA-82fw-gwwq-j7x9、Dependabot [#290](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/290) / [#280](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/280)）に対応。現行版のロックファイルを更新し、`@vitest/mocker` を含む9パッケージを更新。
 - **フロントエンド開発依存の `browserslist` を 4.28.2 → 4.28.9 に更新**: 信頼できないカスタム統計JSONによるクラッシュ／プロトタイプへの書き込み（GHSA-73wf-gq98-2v4g、Dependabot [#273](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/273)）に対応。現行版のロックファイルと関連する5つの依存パッケージを更新。
 - **フロントエンド開発依存の `js-yaml` を 4.3.0 → 4.3.2 に更新**: `!!omap` の処理による過剰な CPU 消費（GHSA-5p4m-2wfm-xmqj、Dependabot [#251](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/251)）に対応。現行版のロックファイルを更新。
 - **[SECURITY] `starlette` を 1.0.1 → 1.3.1 に更新**: Dependabot アラート [#162](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/162) / [#163](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/163) / [#164](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/164) / [#165](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/165)（`starlette < 1.3.1` ほか）を解消。あわせて `uv.lock` を再生成。
