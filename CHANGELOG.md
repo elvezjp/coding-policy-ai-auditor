@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.6.0] - Unreleased
 
 ### Security
+- Align the local-use policy, local CORS defaults, and credential disabling for wildcard lists. Support only the upcoming release, direct vulnerability reports to private channels, and align Node.js requirements with dependencies.
+- Register `/health` before the static mount to prevent 404 responses.
 - **Updated the frontend development dependency `vitest` from 4.1.9 to 4.1.11** to address path traversal / arbitrary file read via the `@vitest/mocker` redirect mock (GHSA-82fw-gwwq-j7x9, Dependabot [#290](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/290) / [#280](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/280)). Updated the current version's lockfile, covering nine packages including `@vitest/mocker`.
 - **Updated the frontend development dependency `browserslist` from 4.28.2 to 4.28.9** to address crashes and prototype writes through untrusted custom statistics JSON (GHSA-73wf-gq98-2v4g, Dependabot [#273](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/273)). Updated the current version's lockfile, including five related dependencies.
 - **Updated the frontend development dependency `js-yaml` from 4.3.0 to 4.3.2** to address excessive CPU consumption when resolving `!!omap` (GHSA-5p4m-2wfm-xmqj, Dependabot [#251](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/251)). Updated the current version's lockfile.

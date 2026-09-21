@@ -75,7 +75,7 @@ We welcome enhancement suggestions! Please create an Issue with the following:
 ### Prerequisites
 
 - Python 3.11 or higher
-- Node.js 20.0.0 or higher
+- Node.js 20.19+ (20.x), 22.12+ (22.x), or 24+
 - [uv](https://docs.astral.sh/uv/) package manager
 - AWS account (optional; required only for Bedrock-based audit)
 

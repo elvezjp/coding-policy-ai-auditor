@@ -10,6 +10,8 @@
 ## [0.6.0] - Unreleased
 
 ### セキュリティ
+- ローカル利用方針、CORS のローカル既定値とワイルドカード混在時の認証情報無効化を統一。サポート対象を次回リリース予定版のみに更新し、脆弱性報告を非公開窓口へ統一。Node.js 要件を依存関係に合わせて修正。
+- 静的配信より前に `/health` を登録し、404 を修正。
 - **フロントエンド開発依存の `vitest` を 4.1.9 → 4.1.11 に更新**: `@vitest/mocker` のリダイレクトモックを経由したパストラバーサル／任意ファイル読み取り（GHSA-82fw-gwwq-j7x9、Dependabot [#290](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/290) / [#280](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/280)）に対応。現行版のロックファイルを更新し、`@vitest/mocker` を含む9パッケージを更新。
 - **フロントエンド開発依存の `browserslist` を 4.28.2 → 4.28.9 に更新**: 信頼できないカスタム統計JSONによるクラッシュ／プロトタイプへの書き込み（GHSA-73wf-gq98-2v4g、Dependabot [#273](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/273)）に対応。現行版のロックファイルと関連する5つの依存パッケージを更新。
 - **フロントエンド開発依存の `js-yaml` を 4.3.0 → 4.3.2 に更新**: `!!omap` の処理による過剰な CPU 消費（GHSA-5p4m-2wfm-xmqj、Dependabot [#251](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/251)）に対応。現行版のロックファイルを更新。

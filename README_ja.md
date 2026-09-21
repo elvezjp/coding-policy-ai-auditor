@@ -18,6 +18,16 @@ https://github.com/user-attachments/assets/01b8fe08-861b-473a-8f1a-f4de00f751f4
 
 ---
 
+## 想定する利用環境
+
+本ツールはローカル実行を前提としており、アプリケーション自体に認証・認可はありません。到達できる相手は、サーバーに設定された認証情報で LLM を呼び出し、課金を発生させる可能性があります。
+
+- バックエンドは `--host 127.0.0.1` を指定して起動してください。
+- ネットワークに公開する場合は、リバースプロキシ等で認証を必須にし、バックエンドへの直接アクセスを制限してください。
+- CORS の既定値は `http://localhost:5173`、`http://127.0.0.1:5173`、`http://localhost:4173`、`http://127.0.0.1:4173` のみです。未設定・空白の場合もこの既定値を使います。
+- 別オリジンを使う場合は `CORS_ORIGINS` に明示してください。`*` を含む設定では認証情報を許可しません。全許可は避けてください。CORS は認証やネットワークアクセス制限の代わりにはなりません。
+
+
 ## 特徴
 
 - **判断系ルールの監査**: Lint等では検出できない意味的・主観的なコーディング規約違反を検出
@@ -48,7 +58,7 @@ https://github.com/user-attachments/assets/01b8fe08-861b-473a-8f1a-f4de00f751f4
 ### 動作環境
 
 - **OS**: macOS / Linux / Windows（WSL推奨）
-- **Node.js**: 20.0.0 以上
+- **Node.js**: 20.19以上（20.x）、22.12以上（22.x）、または24以上
 - **Python**: 3.11 以上
 
 ### 1. 必要なツールをインストールする
@@ -85,7 +95,7 @@ cp .env.example .env
 
 # uvを使用して依存関係をインストール＆サーバーを起動
 uv sync
-uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+uv run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 バックエンドAPIは `http://localhost:8000` で起動します。
@@ -118,7 +128,7 @@ CORS_ORIGINS=http://localhost:5173
 cd frontend && npm run dev
 
 # バックエンドを起動（ターミナル2）
-cd backend && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+cd backend && uv run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 
 # ブラウザで http://localhost:5173 にアクセス
 ```
