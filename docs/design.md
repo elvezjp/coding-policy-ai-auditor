@@ -1,19 +1,6 @@
-# coding-policy-ai-auditor
+# coding-policy-ai-auditor 設計ドキュメント
 
 このドキュメントは、本ツールの設計思想・技術詳細・内部構造に関する開発者向け情報です。
-
----
-
-## v0.5.1 リリースノート（2026-05-07）
-
-### Security
-
-- **[SECURITY] Path Traversal 脆弱性の修正**（[Issue #19](https://github.com/elvezjp/coding-policy-ai-auditor/issues/19)）
-  - `_safe_relative_path` の fallback 処理に欠陥があり、`name` フィールドに `..` を含む値が渡された際に traversal パスがそのまま返されていた問題を修正
-  - 多層防御として、(1) fallback で `Path(...).name` によりディレクトリ部分を除去、(2) `_create_temp_files` で resolve 後に tmpdir 配下に収まるかを境界チェックする処理を追加
-  - 影響範囲はバックエンドの内部メソッドのみで、API 仕様および正常系の挙動に変更はない
-
-詳細はルートの [CHANGELOG.md](../../CHANGELOG.md) を参照してください。
 
 ---
 
@@ -116,11 +103,12 @@ LLMは入力が増えると精度が落ちるため、**規約をまとめて一
 ## ディレクトリ構造
 
 ```
-versions/v0.3/
+coding-policy-ai-auditor/
 ├── frontend/       # フロントエンドアプリケーション
 ├── backend/        # バックエンドアプリケーション
-├── spec.md         # 詳細仕様書
-└── README.md       # 本ファイル
+└── docs/
+    ├── spec.md     # 詳細仕様書
+    └── design.md   # 本ファイル
 ```
 
 ## 静的解析ツール（オプション）

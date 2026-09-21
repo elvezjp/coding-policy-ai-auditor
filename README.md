@@ -67,7 +67,7 @@ Please install the following tools in advance.
 ### 2. Start the Frontend
 
 ```bash
-cd versions/v0.5.1/frontend
+cd frontend
 npm install
 npm run dev
 ```
@@ -77,7 +77,7 @@ Access the web application at `http://localhost:5173` in your browser.
 ### 3. Start the Backend
 
 ```bash
-cd versions/v0.5.1/backend
+cd backend
 
 # Set environment variables
 cp .env.example .env
@@ -115,10 +115,10 @@ CORS_ORIGINS=http://localhost:5173
 
 ```bash
 # Start frontend (Terminal 1)
-cd versions/v0.5.1/frontend && npm run dev
+cd frontend && npm run dev
 
 # Start backend (Terminal 2)
-cd versions/v0.5.1/backend && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+cd backend && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 # Access http://localhost:5173 in your browser
 ```
@@ -139,20 +139,48 @@ Coding standards files can be in [AI Auditor format](docs/ai-auditor-format/) or
 ```
 coding-policy-ai-auditor/
 ├── README.md
-├── add-line-numbers/       # Line numbering library
-├── excel2md/               # Excel to Markdown conversion library
+├── backend/                # Backend application (FastAPI)
+├── frontend/               # Frontend application (Vite + React)
 ├── docs/
-│   └── ai-auditor-format/  # AI Auditor format sample files
-├── versions/
-│   ├── v0.5.1/             # Latest version (recommended)
-│   │   ├── frontend/       # Frontend application
-│   │   ├── backend/        # Backend application
-│   │   └── spec.md         # Detailed specification
-│   ├── v0.5/               # Previous version
-│   ├── v0.4/               # Previous version
-│   └── v0.3/
+│   ├── spec.md             # Detailed specification
+│   ├── design.md           # Design document (for developers)
+│   ├── config-file-generator-spec.md  # Config file generator specification
+│   ├── ai-auditor-format/  # AI Auditor format sample files
+│   └── samples/            # Sample code
 └── ...
 ```
+
+## Related Projects
+
+The following in-house tools are used as dependencies (installed via uv from PyPI or git sources — see `backend/pyproject.toml`).
+
+| Package | Repository | Description |
+|---------|-----------|-------------|
+| add-line-numbers | https://github.com/elvezjp/add-line-numbers | Tool to add line numbers to files |
+| excel2md | https://github.com/elvezjp/excel2md | Excel to CSV Markdown conversion tool |
+
+If you need the sources for reference, clone the upstream repositories directly (e.g., `git clone https://github.com/elvezjp/excel2md.git`). These repositories were previously embedded at the repository root as git subtrees; that layout is preserved in the `v0.5.1` tag.
+
+## Version Management
+
+Only the latest code is kept at the repository root. Versions are managed with git tags.
+
+- The `main` branch accumulates changes for the next version under a `## [X.Y.Z] - Unreleased` heading in [CHANGELOG.md](CHANGELOG.md)
+- On release, the heading date is finalized, the version in `backend/pyproject.toml` (and the frontend version labels) is confirmed, and a `vX.Y.Z` tag is created (see [CONTRIBUTING.md](CONTRIBUTING.md#version-management) for the steps)
+
+### Using Old Versions
+
+Old versions (v0.3–v0.5.1) were previously kept as snapshots under a `versions/` directory. That layout, including the embedded `add-line-numbers/` and `excel2md/` copies, is preserved in the `v0.5.1` tag:
+
+```bash
+git checkout v0.5.1
+# Old versions are under versions/v0.3 ... versions/v0.5.1
+```
+
+**Note**:
+
+- The code under the `v0.5.1` tag is a frozen snapshot and does not include the security fixes made in v0.6.0 and later (path traversal, CORS configuration, and others — see [CHANGELOG.md](CHANGELOG.md)). Use it for reference and verification only, and use the latest version for actual use
+- Do not delete or move the `v0.5.1` tag — it serves as the archive reference point for the old layout
 
 ## Using Static Analysis Tools
 
@@ -227,7 +255,8 @@ uv sync --extra flake8
 
 ## Documentation
 
-- [Detailed Specification](versions/v0.5.1/spec.md) - v0.5.1 specification document
+- [Detailed Specification](docs/spec.md) - Specification document
+- [Design Document](docs/design.md) - Design philosophy, technical details, and internals (for developers, Japanese)
 - [CHANGELOG.md](CHANGELOG.md) - Version history
 - [CONTRIBUTING.md](CONTRIBUTING.md) - How to contribute
 - [SECURITY.md](SECURITY.md) - Security policy
@@ -243,28 +272,17 @@ For details, see [SECURITY.md](SECURITY.md).
 
 ### Dependabot Alert Policy
 
-This repository keeps past releases archived under `versions/` (currently `v0.3`, `v0.4`, `v0.5`, `v0.5.1`), so Dependabot alerts are also raised against their lockfiles. In addition, `add-line-numbers/` and `excel2md/` are pulled in via git subtree and their dependencies are managed in the upstream repositories. Given this, we operate Dependabot alerts as follows.
+This repository keeps only the latest code at the root (`backend/` / `frontend/`) and old versions are referenced via git tags, so old versions are not scanned by Dependabot. The in-house tools (`add-line-numbers`, `excel2md`) are installed as uv dependencies, so their vulnerabilities are detected through the root lockfiles. Given this, we operate Dependabot alerts as follows.
 
 #### Malware tab
 
-- **Always fix, regardless of where it is detected**
-- Malware is not left in place even in archived versions or under git subtree directories
+- **Always fix**
 
 #### Vulnerable tab
 
 | Target | Action |
 |--------|--------|
-| The latest version (currently `versions/v0.5.1/`) | **Fix** (dependency update / PR) |
-| Older versions (`versions/v0.3/`, `versions/v0.4/`, `versions/v0.5/`) | **Dismiss**. Bulk-close existing alerts and dismiss new ones after confirming no impact |
-| git subtree directories (`add-line-numbers/`, `excel2md/`) | **Dismiss**. Managed in the upstream subtree repositories |
-
-#### Workflow
-
-1. When a new alert appears, first check whether it is on the **Malware** tab or the **Vulnerable** tab
-2. **Malware** → fix it regardless of location
-3. **Vulnerable** → check the location
-   - The latest version directory → fix
-   - Older versions or under git subtree → dismiss after confirming no impact
+| Root lockfiles (`backend/uv.lock`, `frontend/package-lock.json`) | **Fix** (dependency update / PR) |
 
 A dismissed alert will not reappear for the same combination of manifest × package × CVE, but a new CVE published for the same package will be raised as a new alert.
 

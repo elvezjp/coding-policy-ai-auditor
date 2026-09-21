@@ -131,18 +131,15 @@ We monitor security advisories for these dependencies and update as needed.
 
 ### Dependabot Alert Policy
 
-This repository keeps past releases archived under `versions/`, which means Dependabot alerts are also raised against their lockfiles. In addition, `add-line-numbers/` and `excel2md/` are pulled in via git subtree, and their dependencies are managed in the upstream repositories. Given this, we operate Dependabot alerts as follows.
+This repository keeps only the latest code at the root (`backend/` / `frontend/`) and old versions are referenced via git tags, so old versions are not scanned by Dependabot. The in-house tools (`add-line-numbers`, `excel2md`) are installed as uv dependencies, so their vulnerabilities are detected through the root lockfiles. Given this, we operate Dependabot alerts as follows.
 
-**Malware tab**: Always fix, regardless of where it is detected.
+**Malware tab**: Always fix.
 
 **Vulnerable**: Follow the table below.
 
 | Target | Action |
 |--------|--------|
-| The latest version | **Fix** (dependency update / PR) |
-| Older versions (under `versions/`) | **Dismiss**. Review impact on new occurrences and close |
-| git subtree directories (`add-line-numbers/`) | **Dismiss**. Fix in the upstream subtree repository, then sync to this repository |
-| git subtree directories (`excel2md/`) | **Dismiss**. Used only in older versions; review impact and close |
+| Root lockfiles (`backend/uv.lock`, `frontend/package-lock.json`) | **Fix** (dependency update / PR) |
 
 A dismissed alert will not reappear for the same combination of manifest × package × CVE, but a new CVE published for the same package will be raised as a new alert.
 
