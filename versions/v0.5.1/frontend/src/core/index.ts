@@ -30,7 +30,6 @@ export {
 export { ScreenContainer } from './components/shared/ScreenContainer'
 export { TokenEstimator } from './components/shared/TokenEstimator'
 export { SystemPromptEditor } from './components/shared/SystemPromptEditor'
-export { VersionSelector } from './components/shared/VersionSelector'
 export { ExcelSpreadsheetLoader } from './components/shared/spreadsheet'
 export { SpreadsheetViewer } from './components/shared/spreadsheet'
 
@@ -44,4 +43,3 @@ export {
   DEFAULT_LLM_SETTINGS,
 } from './hooks/useSettings'
 export { useTokenEstimation, estimateTokenCount } from './hooks/useTokenEstimation'
-export { useVersions, DEFAULT_VERSIONS } from './hooks/useVersions'
