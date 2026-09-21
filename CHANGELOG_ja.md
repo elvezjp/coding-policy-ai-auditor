@@ -9,28 +9,30 @@
 
 ## [0.6.0] - 2026-09-21
 
+`versions/` ディレクトリを廃止して最新コードのみをルート直下で保持する構成へ移行し、あわせてセキュリティ修正と依存関係の更新を行ったリリース。
+
 ### セキュリティ
-- ローカル利用方針、CORS のローカル既定値とワイルドカード混在時の認証情報無効化を統一。サポート対象を次回リリース予定版のみに更新し、脆弱性報告を非公開窓口へ統一。Node.js 要件を依存関係に合わせて修正。
-- 静的配信より前に `/health` を登録し、404 を修正。
-- **フロントエンド開発依存の `vitest` を 4.1.9 → 4.1.11 に更新**: `@vitest/mocker` のリダイレクトモックを経由したパストラバーサル／任意ファイル読み取り（GHSA-82fw-gwwq-j7x9、Dependabot [#290](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/290) / [#280](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/280)）に対応。現行版のロックファイルを更新し、`@vitest/mocker` を含む9パッケージを更新。
-- **フロントエンド開発依存の `browserslist` を 4.28.2 → 4.28.9 に更新**: 信頼できないカスタム統計JSONによるクラッシュ／プロトタイプへの書き込み（GHSA-73wf-gq98-2v4g、Dependabot [#273](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/273)）に対応。現行版のロックファイルと関連する5つの依存パッケージを更新。
-- **フロントエンド開発依存の `js-yaml` を 4.3.0 → 4.3.2 に更新**: `!!omap` の処理による過剰な CPU 消費（GHSA-5p4m-2wfm-xmqj、Dependabot [#251](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/251)）に対応。現行版のロックファイルを更新。
-- **[SECURITY] `starlette` を 1.0.1 → 1.3.1 に更新**: Dependabot アラート [#162](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/162) / [#163](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/163) / [#164](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/164) / [#165](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/165)（`starlette < 1.3.1` ほか）を解消。あわせて `uv.lock` を再生成。
-- **[SECURITY] 認証なし Excel 変換 API のパストラバーサルによる任意ファイル書き込みを修正**（GHSA-ghvr-jjv7-mx45）: `POST /api/convert/excel-to-markdown`（`excel2md_tool.py` / `excel2md_mermaid_tool.py`）がクライアント指定のアップロードファイル名を一時ディレクトリのパスへそのまま結合していたため、絶対パスや `../` を含む値で一時ディレクトリ外にファイルを作成・上書きできた。クライアント由来のファイル名は `safe_filename()`（`backend/app/safe_path.py` に追加）でディレクトリ成分を除去してから使用するよう修正し、回帰テストを追加。注: 旧バージョンのスナップショット `versions/v0.3` / `versions/v0.4` / `versions/v0.5` にも同一の欠陥があったが、修正は行わず、本リリースで `versions/` ごと削除した（「変更」参照）
-- **[SECURITY] 自社リポジトリ由来の依存をタグ指定の git 参照に変更**: `add-line-numbers` をリポジトリ内の複製（`add-line-numbers/`、v0.1.0）へのローカルパス参照（`path = "../../../add-line-numbers", editable = true`）で取り込んでいたため、依存の実体がバージョン管理外の作業ツリーの状態に左右され、参照先のすり替えが差分に現れない経路が残っていた（CWE-829）。`{ git = "https://github.com/elvezjp/add-line-numbers.git", tag = "v0.1.3" }` に変更し、上流のリリースタグから取得するようにした。更新は `pyproject.toml` の差分としてレビューに乗る。あわせて `[project.dependencies]` に下限 `>=0.1.3` を宣言し、pytest の `pythonpath` から複製ディレクトリへの参照を除去（複製側が優先して読み込まれると固定の意味が失われるため）。取り込んだ `add_line_numbers.py` は複製と上流 v0.1.3 で完全一致しており、実行時の挙動は変わらない。注: 旧バージョンのスナップショット `versions/v0.3` / `versions/v0.4` / `versions/v0.5` は同じローカルパス参照のままだったが、本リリースで `versions/` ごと削除し、あわせて複製ディレクトリ `add-line-numbers/` も削除した（「変更」「削除」参照）
-- **依存パッケージを一括更新**: `uv lock --upgrade` で `backend/uv.lock` を再生成し、30 パッケージを更新。主なものは `starlette` 1.3.1 → 1.6.0、`fastapi` 0.137.1 → 0.141.1、`uvicorn` 0.49.0 → 0.52.1、`anthropic` 0.109.2 → 0.121.0、`openai` 2.42.0 → 2.53.0、`boto3` 1.43.31 → 1.43.67、`pandas` 3.0.3 → 3.0.5、`numpy` 2.4.6 → 2.5.1、`markitdown` 0.1.6 → 0.1.7、`ruff` 0.15.17 → 0.16.2。CORS 修正が依拠する Starlette の全許可判定（`allow_all_origins = "*" in allow_origins`）は 1.6.0 でも変わらないことを確認済み。既存を含めて178件全通過
-- **[SECURITY] CORS 全許可時に認証情報を許可しないよう修正**（#33）: `CORS_ORIGINS` の既定値が `*` であるにもかかわらず `allow_credentials=True` としていた。Starlette はワイルドカードと認証情報を併用できないため、この場合 `Access-Control-Allow-Origin` にリクエスト元の Origin をそのまま返す（`allow_all_origins and allow_credentials` → `allow_explicit_origin()`）。結果として任意のサイトがこの API へ資格情報付きで到達して応答を読めるため、ローカル起動中に利用者が悪意あるページを開くと監査対象のコードや設計書が読み取られうる状態だった。全許可のときは認証情報を許可しないよう修正（オリジンを限定している場合の挙動は変更なし）。Starlette は `"*"` がリストに **含まれる** かどうかで全許可を判定する（`allow_all_origins = "*" in allow_origins`）ため、判定は等価比較ではなく包含判定とし、`CORS_ORIGINS="https://app.example.com,*"` のようなワイルドカード混在設定も対象とした。回帰テストを6件追加。注: 旧バージョンのスナップショット `versions/v0.3` / `versions/v0.4` / `versions/v0.5` にも同一の欠陥があったが、修正は行わず、本リリースで `versions/` ごと削除した（「変更」参照）
-- **[SECURITY] フロントエンド依存関係を更新し Dependabot アラートを解消**（#32）: `react-router-dom` を 7.17.0 → 7.18.2 に更新してアラート [#192](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/192) / [#204](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/204) / [#210](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/210) / [#212](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/212)（XSS、ルートマッチング DoS、コンストラクタインジェクション、オープンリダイレクト）を解消。あわせて推移的な開発依存 `js-yaml` 4.2.0 → 4.3.0（アラート [#199](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/199)）と `brace-expansion` → 1.1.16 / 5.0.8（アラート [#186](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/186)、いずれも CPU 消費型 DoS）を更新し、`postcss` も 8.5.15 → 8.5.24 に先行更新（GHSA-r28c-9q8g-f849、任意 `.map` ファイル漏えい）。アラート [#200](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/200)（GHSA-qwww-vcr4-c8h2、RSC モードの CSRF）は unstable RSC API 未使用かつ 7.x 系修正版が存在しないため「該当機能未使用」として dismiss
+- **Excel 変換 API のパストラバーサルによる任意ファイル書き込みを修正**（GHSA-ghvr-jjv7-mx45）: `POST /api/convert/excel-to-markdown` がクライアント指定のファイル名を一時ディレクトリのパスへそのまま結合しており、絶対パスや `../` で一時ディレクトリ外にファイルを作成・上書きできた。`safe_filename()` でディレクトリ成分を除去するよう修正し、回帰テストを追加
+- **[BREAKING] CORS の既定値を全許可（`*`）からローカル開発用オリジンのみに変更**（#33, #43）: `CORS_ORIGINS` が未設定・空白の場合は `http://localhost:5173` / `http://127.0.0.1:5173` / `http://localhost:4173` / `http://127.0.0.1:4173` のみを許可する。`*` を含む設定（`https://app.example.com,*` のような混在を含む）では認証情報（`allow_credentials`）を許可しない。従来は既定の全許可と `allow_credentials=True` の組み合わせにより、Starlette がリクエスト元の Origin をそのまま返し、任意のサイトが監査対象のコードや設計書を含む応答を読める状態だった。**注意:** フロントエンドは同一オリジンから API を呼ぶため通常の構成に影響はないが、別オリジンから API を呼んでいる場合は `CORS_ORIGINS` の明示が必要
+- **自社ツール `add-line-numbers` をタグ指定の git 依存に変更**（#35、CWE-829）: リポジトリ内の複製へのローカルパス参照をやめ、上流のリリースタグ `v0.1.3` から取得する。実行時の挙動は変わらない
+- **ローカル利用を前提とする方針を明記**（#43）: 本ツールは認証・認可を持たないため、README / SECURITY に「想定する利用環境」を追加し、起動例を `--host 127.0.0.1` に統一。SECURITY のサポート対象を最新版のみとし、脆弱性の報告先を非公開の窓口（GitHub の非公開脆弱性報告またはメール）に統一
+- **依存関係を更新して既知の脆弱性に対応**:
+  - バックエンド: `starlette` 1.0.1 → 1.6.0（Dependabot アラート #162〜#165）。`uv lock --upgrade` により `fastapi` 0.141.1、`uvicorn` 0.52.1、`anthropic` 0.121.0、`openai` 2.53.0 など計 30 パッケージを更新
+  - フロントエンド: `react-router-dom` 7.17.0 → 7.18.2（XSS、ルートマッチング DoS、コンストラクタインジェクション、オープンリダイレクト。#32）、`vitest` 4.1.9 → 4.1.11（GHSA-82fw-gwwq-j7x9）、`browserslist` 4.28.2 → 4.28.9（GHSA-73wf-gq98-2v4g）、`js-yaml` 4.2.0 → 4.3.2（GHSA-5p4m-2wfm-xmqj ほか）、`brace-expansion` → 1.1.16 / 5.0.8、`postcss` 8.5.15 → 8.5.24（GHSA-r28c-9q8g-f849）
+  - GHSA-qwww-vcr4-c8h2（`react-router` の RSC モードの CSRF）は、該当機能を使用しておらず 7.x 系の修正版も存在しないため dismiss
+
+### 修正
+- **`/health` が 404 を返す問題を修正**（#43）: 静的ファイル配信（`/` への mount）より後にルートを登録していたため到達できなかった。登録順を入れ替え、回帰テストを追加
 
 ### 変更
-- **[BREAKING] `versions/` ディレクトリを廃止し、最新コードのみをルート直下で保持する構成に移行** (#24): これまで `versions/` 配下に全バージョン（v0.3 / v0.4 / v0.5 / v0.5.1）のスナップショットを実体として保持してきたが、旧バージョンの lockfile に対する Dependabot アラートの重複通知や、セキュリティ修正のたびに発生する対象外トリアージの原因になっていた。`versions/v0.5.1/backend`・`frontend` をルート直下の `backend/`・`frontend/` に昇格し、`spec.md` / `config-file-generator-spec.md` を `docs/` へ、開発者向け設計ドキュメント（旧 `versions/v0.5.1/README.md`）を `docs/design.md` へ移動した。`versions/v0.3`・`v0.4`・`v0.5` と `versions/README.md` は削除した。CI の `working-directory` もルート構成に変更した。旧構成（`versions/` と同梱ディレクトリ一式）は既存の `v0.5.1` タグに保存されており、`git checkout v0.5.1` で参照できる（旧バージョンごとのタグは新規作成しない）。今後は main に次バージョンの変更を蓄積し、リリース時に `vX.Y.Z` タグを打つ運用とする
-- **ドキュメントを単一バージョン構成・git tag 運用に合わせて整備** (#24, #26): README / CONTRIBUTING のセットアップ・テスト手順をルート構成（`cd backend` / `cd frontend`）に書き換え、README に「関連プロジェクト」「バージョン管理」を追加して、旧構成を `git checkout v0.5.1` で参照する手順を記載した。`v0.5.1` タグ配下のコードは本リリースのセキュリティ修正を含まない凍結スナップショットであり、参照・検証用途に限る旨も明記した。README / SECURITY の Dependabot 運用方針は、旧バージョン・git subtree を Dismiss する前提の記述を削除し、ルートの lockfile のみを対象とする内容に更新した
-- **フロントエンド CI の Node.js マトリクスを `["20", "23"]` → `["20", "24"]` に変更**: Node.js 23 はサポートが終了した奇数版で、`vitest` 4.1.11 の対応範囲（`^20.0.0 || ^22.0.0 || >=24.0.0`）外のため。Node.js 20 と LTS 系の Node.js 24 でテストする。
-- **[BREAKING] `excel2md` を同梱ディレクトリの `sys.path` 注入から PyPI 依存に移行** (#26): `excel2md_tool.py` / `excel2md_mermaid_tool.py` は、リポジトリ直下に同梱した `excel2md/v2.1.1` を `sys.path` に動的注入して読み込んでおり、`excel2md` だけが `pyproject.toml` の依存管理の外にあった。`dependencies` に `excel2md>=2.2.1` を追加し（PyPI 公開済みのため `[tool.uv.sources]` は不要。lock 上は 2.3.0）、`excel2md.cli.build_argparser` / `excel2md.runner.run` の通常 import に書き換えた。これに伴い、同梱外の excel2md を指定するための環境変数 `EXCEL2MD_PATH` は廃止した。サンプル規約 Excel（`docs/ai-auditor-format/`）の変換結果は、excel2md / excel2md-mermaid とも移行前後で生成日時の行を除き一致することを確認済み。全 178 テストがパス
+- **[BREAKING] `versions/` ディレクトリを廃止し、最新コードのみをルート直下で保持する構成に移行**（#24）: `versions/v0.5.1/` の `backend`・`frontend` をルート直下へ、仕様書類を `docs/` へ移動し、旧バージョン（v0.3 / v0.4 / v0.5）のスナップショットを削除。旧バージョンの lockfile に対する Dependabot アラートの重複通知が解消される。旧構成は `v0.5.1` タグに保存されており `git checkout v0.5.1` で参照できる（同タグのコードは本リリースのセキュリティ修正を含まない）。今後はリリース時に `vX.Y.Z` タグを作成する
+- **[BREAKING] `excel2md` を同梱ディレクトリの `sys.path` 注入から PyPI 依存に移行**（#26）: `excel2md>=2.2.1` を依存に追加（v2.1.1 → v2.3.0）。環境変数 `EXCEL2MD_PATH` は廃止。サンプル規約 Excel の変換結果が移行前後で一致することを確認済み
+- **ドキュメントを単一バージョン構成・git tag 運用に合わせて整備**（#24, #26）: README / CONTRIBUTING の手順をルート構成に書き換え、README に「関連プロジェクト」「バージョン管理」を追加。Dependabot 運用方針をルートの lockfile のみを対象とする内容に更新
+- **Node.js の要件を依存関係に合わせて更新**（#43）: 20.19 以上（20.x）/ 22.12 以上（22.x）/ 24 以上。フロントエンド CI の Node.js マトリクスも `["20", "23"]` → `["20", "24"]` に変更
 
 ### 削除
-- **未使用のバージョン切替コードを削除** (#24): フロントエンドの `VersionSelector` / `useVersions` / `DEFAULT_VERSIONS` / `VersionInfo` は `core/index.ts` から export されているだけで、画面・テストのいずれからも参照されていなかったため削除した。画面の表示・挙動に変更はない
-- **[BREAKING] 同梱していた自社ツールのディレクトリ `add-line-numbers/`・`excel2md/` を削除** (#24, #26): いずれも git subtree でリポジトリ直下に取り込んでいたが、`add-line-numbers` は上流リリースタグの git 依存、`excel2md` は PyPI 依存へ移行済みで、どこからも参照されなくなっていた。実体を残すと上流の更新を取り込めないうえ、同梱ディレクトリ内の manifest が Dependabot に独立した依存セットとして認識され、重複アラートの原因になっていた。`add-line-numbers/` は旧バージョン（`versions/v0.3`〜`v0.5`）がローカルパス参照していたため削除できずにいたが、`versions/` の廃止により削除可能になり、依存の実体が版管理外の作業ツリー状態に左右される経路（CWE-829）の是正が完了した。これによりリポジトリ内の依存マニフェストは 19 ファイルから 4 ファイル（`backend/pyproject.toml`・`backend/uv.lock`・`frontend/package.json`・`frontend/package-lock.json`）になった。ソースを参照したい場合は各上流リポジトリ（[add-line-numbers](https://github.com/elvezjp/add-line-numbers)、[excel2md](https://github.com/elvezjp/excel2md)）を clone する
+- **[BREAKING] 同梱していた自社ツールのディレクトリ `add-line-numbers/`・`excel2md/` を削除**（#24, #26）: それぞれ git 依存・PyPI 依存へ移行済みで未参照だった。リポジトリ内の依存マニフェストは 19 ファイルから 4 ファイルになった。ソースを参照したい場合は各上流リポジトリ（[add-line-numbers](https://github.com/elvezjp/add-line-numbers)、[excel2md](https://github.com/elvezjp/excel2md)）を clone する
+- **未使用のバージョン切替コードを削除**（#24）: フロントエンドの `VersionSelector` / `useVersions` など。画面の表示・挙動に変更はない
 
 ## [0.5.1] - 2026-05-11
 
@@ -132,6 +134,7 @@
 
 | バージョン | 主な機能 |
 |------------|----------|
+| 0.6.0      | `versions/` 廃止・ルート構成へ移行、excel2md の PyPI 移行、セキュリティ修正（Excel 変換 API のパストラバーサル、CORS 既定値のローカル限定）、`/health` の 404 修正 |
 | 0.5.1      | Path Traversal 脆弱性の修正、excel2md subtree を v2.1.1 に更新 |
 | 0.5.0      | Windows静的解析対応、CP932エンコーディング対応、テスト安定化 |
 | 0.4.0      | AIオーディター形式Excel対応、規約選択機能 |
@@ -140,23 +143,25 @@
 
 ### 機能マトリクス
 
-| 機能 | v0.5.1 | v0.5 | v0.4 | v0.3 | v0.1 |
-|------|--------|------|------|------|------|
-| Javaファイルアップロード | ✅ | ✅ | ✅ | ✅ | ✅ |
-| ルールプロンプト管理 | ✅ | ✅ | ✅ | ✅ | ✅ |
-| リアルタイム進捗表示 | ✅ | ✅ | ✅ | ✅ | ✅ |
-| LLM監査実行 | ✅ | ✅ | ✅ | ✅ | ⚠️ |
-| 静的解析 (Checkstyle/PMD) | ✅ | ✅ | ✅ | ✅ | ✅ |
-| 静的解析 (Ruff/Flake8/Pylint) | ✅ | ✅ | ✅ | ✅ | ❌ |
-| 結果フィルタリング | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Markdownレポート出力 | ✅ | ✅ | ✅ | ✅ | ✅ |
-| 設定ファイルジェネレーター | ✅ | ✅ | ✅ | ✅ | ❌ |
-| 単体テスト | ✅ | ✅ | ✅ | ✅ | ❌ |
-| AIオーディター形式Excel | ✅ | ✅ | ✅ | ❌ | ❌ |
-| 規約選択機能 | ✅ | ✅ | ✅ | ❌ | ❌ |
-| Windows 静的解析対応 | ✅ | ✅ | ❌ | ❌ | ❌ |
-| CP932 エンコーディング対応 | ✅ | ✅ | ❌ | ❌ | ❌ |
-| Path Traversal 脆弱性修正 (#19) | ✅ | ⚠️ | ⚠️ | ⚠️ | - |
-| excel2md subtree バージョン | v2.1.1 | v2.0 | v2.0 | v2.0 | - |
+| 機能 | v0.6.0 | v0.5.1 | v0.5 | v0.4 | v0.3 | v0.1 |
+|------|--------|--------|------|------|------|------|
+| Javaファイルアップロード | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| ルールプロンプト管理 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| リアルタイム進捗表示 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| LLM監査実行 | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ |
+| 静的解析 (Checkstyle/PMD) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| 静的解析 (Ruff/Flake8/Pylint) | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
+| 結果フィルタリング | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Markdownレポート出力 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| 設定ファイルジェネレーター | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
+| 単体テスト | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
+| AIオーディター形式Excel | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| 規約選択機能 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| Windows 静的解析対応 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| CP932 エンコーディング対応 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Path Traversal 脆弱性修正 (#19) | ✅ | ✅ | ⚠️ | ⚠️ | ⚠️ | - |
+| excel2md バージョン（v0.5.1 以前は subtree） | v2.3.0（PyPI） | v2.1.1 | v2.0 | v2.0 | v2.0 | - |
+| Excel 変換 API のパストラバーサル修正 (GHSA-ghvr-jjv7-mx45) | ✅ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | - |
+| CORS 既定値のローカル限定・全許可時の認証情報無効化 | ✅ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | - |
 
 **凡例**: ✅ 実装済み / ⚠️ 問題あり / ❌ 未実装
