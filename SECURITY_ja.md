@@ -131,18 +131,15 @@ coding-policy-ai-auditor には以下のセキュリティ対策が含まれて�
 
 ### Dependabot アラートの運用方針
 
-本リポジトリは旧バージョンのコードを `versions/` 配下にアーカイブとして保持しているため、それらの lockfile に対しても Dependabot アラートが発生します。また、`add-line-numbers/`、`excel2md/` は git subtree で取り込んでおり、依存管理は各 subtree 元リポジトリ側で行います。これらを踏まえ、本リポジトリでは以下の方針で Dependabot アラートを運用します。
+本リポジトリはルート直下（`backend/` / `frontend/`）に最新コードのみを保持し、旧バージョンは git tag で参照するため、旧バージョンは Dependabot のスキャン対象になりません。自社ツール（`add-line-numbers`、`excel2md`）は uv の依存関係として取得しており、それらの脆弱性はルートの lockfile 経由で検出されます。本リポジトリでは以下の方針で Dependabot アラートを運用します。
 
-**Malware タブ**: 発生場所を問わず必ず修正対応する
+**Malware タブ**: 必ず修正対応する
 
 **Vulnerable**: 以下の表に従う
 
 | 対象 | 対応 |
 |------|------|
-| 最新バージョン | **修正対応**（依存更新／PR作成） |
-| 旧バージョン（`versions/` 配下） | **Dismiss**。新規発生時は影響を確認のうえclose |
-| git subtree 配下（`add-line-numbers/`） | **Dismiss**。subtree 元リポジトリ側で修正後、本リポジトリに同期する |
-| git subtree 配下（`excel2md/`） | **Dismiss**。旧バージョンでしか使われないため、影響を確認のうえclose |
+| ルートの lockfile（`backend/uv.lock`、`frontend/package-lock.json`） | **修正対応**（依存更新／PR作成） |
 
 Dismiss したアラートは「同一 manifest × 同一パッケージ × 同一 CVE」の組み合わせでは再発生しませんが、同じパッケージに別の CVE が公開された場合は新規アラートとして再通知されます。
 

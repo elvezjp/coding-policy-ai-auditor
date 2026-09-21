@@ -67,7 +67,7 @@ https://github.com/user-attachments/assets/01b8fe08-861b-473a-8f1a-f4de00f751f4
 ### 2. フロントエンドを起動する
 
 ```bash
-cd versions/v0.5.1/frontend
+cd frontend
 npm install
 npm run dev
 ```
@@ -77,7 +77,7 @@ npm run dev
 ### 3. バックエンドを起動する
 
 ```bash
-cd versions/v0.5.1/backend
+cd backend
 
 # 環境変数を設定
 cp .env.example .env
@@ -115,10 +115,10 @@ CORS_ORIGINS=http://localhost:5173
 
 ```bash
 # フロントエンドを起動（ターミナル1）
-cd versions/v0.5.1/frontend && npm run dev
+cd frontend && npm run dev
 
 # バックエンドを起動（ターミナル2）
-cd versions/v0.5.1/backend && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+cd backend && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 # ブラウザで http://localhost:5173 にアクセス
 ```
@@ -139,20 +139,48 @@ cd versions/v0.5.1/backend && uv run uvicorn app.main:app --reload --host 0.0.0.
 ```
 coding-policy-ai-auditor/
 ├── README.md
-├── add-line-numbers/       # 行番号付与ライブラリ
-├── excel2md/               # Excel → Markdown 変換ライブラリ
+├── backend/                # バックエンドアプリケーション（FastAPI）
+├── frontend/               # フロントエンドアプリケーション（Vite + React）
 ├── docs/
-│   └── ai-auditor-format/  # AIオーディター形式サンプルファイル
-├── versions/
-│   ├── v0.5.1/             # 最新版（推奨）
-│   │   ├── frontend/       # フロントエンドアプリケーション
-│   │   ├── backend/        # バックエンドアプリケーション
-│   │   └── spec.md         # 詳細仕様書
-│   ├── v0.5/               # 旧バージョン
-│   ├── v0.4/               # 旧バージョン
-│   └── v0.3/
+│   ├── spec.md             # 詳細仕様書
+│   ├── design.md           # 設計ドキュメント（開発者向け）
+│   ├── config-file-generator-spec.md  # 設定ファイルジェネレーター仕様書
+│   ├── ai-auditor-format/  # AIオーディター形式サンプルファイル
+│   └── samples/            # サンプルコード
 └── ...
 ```
+
+## 関連プロジェクト
+
+以下の自社ツールを依存関係として使用しています（uv により PyPI または git ソースからインストール。`backend/pyproject.toml` 参照）。
+
+| パッケージ | リポジトリ | 説明 |
+|------------|-----------|------|
+| add-line-numbers | https://github.com/elvezjp/add-line-numbers | ファイルに行番号を追加するツール |
+| excel2md | https://github.com/elvezjp/excel2md | Excel→CSVマークダウン変換ツール |
+
+ソースを参照したい場合は、各上流リポジトリを直接 clone してください（例: `git clone https://github.com/elvezjp/excel2md.git`）。これらのリポジトリは以前 git subtree としてリポジトリ直下に取り込まれており、その構成は `v0.5.1` タグに保存されています。
+
+## バージョン管理
+
+リポジトリのルートでは最新のコードのみを保持し、バージョン管理は git tag で行います。
+
+- `main` ブランチには次バージョンの変更を [CHANGELOG_ja.md](CHANGELOG_ja.md) の `## [X.Y.Z] - Unreleased` 見出しの下に蓄積します
+- リリース時に見出しの日付を確定し、`backend/pyproject.toml` のバージョン（およびフロントエンドのバージョン表記）を確認のうえ、`vX.Y.Z` タグを作成します（手順は [CONTRIBUTING_ja.md](CONTRIBUTING_ja.md#バージョン管理) を参照）
+
+### 旧バージョンを利用する場合
+
+旧バージョン（v0.3〜v0.5.1）は、以前は `versions/` ディレクトリ配下にスナップショットとして保持していました。この構成（同梱していた `add-line-numbers/`・`excel2md/` を含む）は `v0.5.1` タグに保存されています。
+
+```bash
+git checkout v0.5.1
+# 旧バージョンは versions/v0.3 〜 versions/v0.5.1 配下にあります
+```
+
+**注意**:
+
+- `v0.5.1` タグ配下のコードは凍結スナップショットであり、v0.6.0 以降のセキュリティ修正（パストラバーサル、CORS 設定など。詳細は [CHANGELOG_ja.md](CHANGELOG_ja.md)）を含みません。参照・検証用途に限り、実際の利用には最新版を使用してください
+- `v0.5.1` タグは旧構成のアーカイブ参照点のため、削除・付け替えを行わないでください
 
 ## 静的解析ツールの利用
 
@@ -226,7 +254,8 @@ uv sync --extra flake8
 
 ## ドキュメント
 
-- [詳細仕様書](versions/v0.5.1/spec.md) - v0.5.1 仕様書
+- [詳細仕様書](docs/spec.md) - 仕様書
+- [設計ドキュメント](docs/design.md) - 設計思想・技術詳細・内部構造（開発者向け）
 - [CHANGELOG.md](CHANGELOG.md) - バージョン履歴
 - [CONTRIBUTING.md](CONTRIBUTING.md) - コントリビューション方法
 - [SECURITY.md](SECURITY.md) - セキュリティポリシー
@@ -242,28 +271,17 @@ uv sync --extra flake8
 
 ### Dependabot アラートの運用方針
 
-本リポジトリは過去のリリースを `versions/` 配下にアーカイブしており（現在は `v0.3`, `v0.4`, `v0.5`, `v0.5.1`）、それらのロックファイルに対しても Dependabot アラートが発報されます。また、`add-line-numbers/` と `excel2md/` は git subtree で取り込んでおり、依存関係は元リポジトリ側で管理されています。これらを踏まえ、Dependabot アラートは以下のとおり運用します。
+本リポジトリはルート直下（`backend/` / `frontend/`）に最新コードのみを保持し、旧バージョンは git tag で参照するため、旧バージョンは Dependabot のスキャン対象になりません。自社ツール（`add-line-numbers`、`excel2md`）は uv の依存関係として取得しており、それらの脆弱性はルートの lockfile 経由で検出されます。これらを踏まえ、Dependabot アラートは以下のとおり運用します。
 
 #### Malware タブ
 
-- **発生場所を問わず必ず修正対応する**
-- 旧バージョンや git subtree 配下であっても放置しない
+- **必ず修正対応する**
 
 #### Vulnerable タブ
 
 | 対象 | 対応 |
 |------|------|
-| 最新バージョン（現在は `versions/v0.5.1/`） | **修正対応する**（依存更新／PR 作成） |
-| 旧バージョン（`versions/v0.3/`, `versions/v0.4/`, `versions/v0.5/`） | **Dismiss**。既存分は一括 close、新規発生時は影響を確認のうえ close |
-| git subtree ディレクトリ（`add-line-numbers/`, `excel2md/`） | **Dismiss**。subtree 元リポジトリ側で管理されているため、本リポジトリでは修正対象外 |
-
-#### 運用フロー
-
-1. 新規アラート発生時、まず **Malware タブ**か **Vulnerable タブ**かを確認する
-2. **Malware** → 場所を問わず修正
-3. **Vulnerable** → 発生場所を確認
-   - 最新バージョンディレクトリ → 修正対応
-   - 旧バージョン or git subtree 配下 → 影響なしを確認のうえ Dismiss
+| ルートの lockfile（`backend/uv.lock`、`frontend/package-lock.json`） | **修正対応する**（依存更新／PR 作成） |
 
 Dismiss したアラートは同一 manifest × 同一パッケージ × 同一 CVE の組み合わせでは再発生しませんが、同パッケージで別の CVE が将来公開された場合は新規アラートとして再通知されます。
 
