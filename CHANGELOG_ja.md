@@ -27,6 +27,7 @@
 
 ### 削除
 - **未使用のバージョン切替コードを削除** (#24): フロントエンドの `VersionSelector` / `useVersions` / `DEFAULT_VERSIONS` / `VersionInfo` は `core/index.ts` から export されているだけで、画面・テストのいずれからも参照されていなかったため削除した。画面の表示・挙動に変更はない
+- **[BREAKING] 同梱していた自社ツールのディレクトリ `add-line-numbers/`・`excel2md/` を削除** (#24, #26): いずれも git subtree でリポジトリ直下に取り込んでいたが、`add-line-numbers` は上流リリースタグの git 依存、`excel2md` は PyPI 依存へ移行済みで、どこからも参照されなくなっていた。実体を残すと上流の更新を取り込めないうえ、同梱ディレクトリ内の manifest が Dependabot に独立した依存セットとして認識され、重複アラートの原因になっていた。`add-line-numbers/` は旧バージョン（`versions/v0.3`〜`v0.5`）がローカルパス参照していたため削除できずにいたが、`versions/` の廃止により削除可能になり、依存の実体が版管理外の作業ツリー状態に左右される経路（CWE-829）の是正が完了した。これによりリポジトリ内の依存マニフェストは 19 ファイルから 4 ファイル（`backend/pyproject.toml`・`backend/uv.lock`・`frontend/package.json`・`frontend/package-lock.json`）になった。ソースを参照したい場合は各上流リポジトリ（[add-line-numbers](https://github.com/elvezjp/add-line-numbers)、[excel2md](https://github.com/elvezjp/excel2md)）を clone する
 
 ## [0.5.1] - 2026-05-11
 
