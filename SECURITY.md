@@ -4,15 +4,21 @@
 
 ## Supported Versions
 
-The latest version is supported:
+Only the latest version, 0.6.0, is supported.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 0.5.1   | :white_check_mark: |
-| 0.4.x   | :white_check_mark: |
-| < 0.4   | :x:                |
+| Version | Supported |
+| --- | --- |
+| 0.6.0 | Yes |
+| < 0.6.0 | No |
 
-> **Note**: 0.5.0 contained a Path Traversal vulnerability ([Issue #19](https://github.com/elvezjp/coding-policy-ai-auditor/issues/19)) and has been superseded by 0.5.1. Users on 0.5.0 should upgrade to 0.5.1.
+## Intended Environment
+
+This tool is intended for local use and has no application authentication or authorization. Anyone who can reach it may invoke the LLM using server credentials and incur charges.
+
+- Start the backend with `--host 127.0.0.1`.
+- If exposing it on a network, require authentication at a reverse proxy and restrict direct access to the backend.
+- CORS defaults to `http://localhost:5173`, `http://127.0.0.1:5173`, `http://localhost:4173`, and `http://127.0.0.1:4173`, including when unset or blank.
+- Set `CORS_ORIGINS` explicitly for other origins. Credentials are disabled whenever the list contains `*`. Avoid allow-all settings. CORS does not replace authentication or network access controls.
 
 ## Reporting a Vulnerability
 
@@ -20,10 +26,9 @@ If you discover a security vulnerability in coding-policy-ai-auditor, please fol
 
 ### How to Report
 
-1. **Do not** create a public GitHub Issue for security vulnerabilities
-2. Send a detailed report to the maintainers via one of the following methods:
-   - Create a GitHub Private Security Advisory (recommended)
-   - Create an Issue with the "security" label for low-severity issues
+1. Do not post vulnerability details in public GitHub Issues, regardless of severity.
+2. Use [GitHub private vulnerability reporting](https://github.com/elvezjp/coding-policy-ai-auditor/security/advisories/new).
+3. If private reporting is unavailable, email info@elvez.co.jp.
 
 ### What to Include
 
@@ -102,7 +107,7 @@ This application may use the following APIs:
 
 coding-policy-ai-auditor includes the following security measures:
 
-- File extension and MIME type validation for uploads
+- File extension validation for Excel uploads; the API does not validate the uploaded MIME type
 - File size limits
 - Input file validation
 

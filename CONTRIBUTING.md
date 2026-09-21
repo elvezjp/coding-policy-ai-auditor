@@ -75,7 +75,7 @@ We welcome enhancement suggestions! Please create an Issue with the following:
 ### Prerequisites
 
 - Python 3.11 or higher
-- Node.js 20.0.0 or higher
+- Node.js 20.19+ (20.x), 22.12+ (22.x), or 24+
 - [uv](https://docs.astral.sh/uv/) package manager
 - AWS account (optional; required only for Bedrock-based audit)
 
@@ -103,7 +103,7 @@ cd backend
 uv run pytest tests/ -v
 
 # Run a specific test file
-uv run pytest tests/test_audit.py -v
+uv run pytest tests/test_convert_api.py -v
 
 # Run with coverage
 uv run pytest tests/ --cov=app --cov-report=html

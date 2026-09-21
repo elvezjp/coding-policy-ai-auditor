@@ -7,28 +7,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.6.0] - Unreleased
+## [0.6.0] - 2026-09-21
+
+This release retires the `versions/` directory in favor of a layout that keeps only the latest code at the repository root, together with security fixes and dependency updates.
 
 ### Security
-- **Updated the frontend development dependency `vitest` from 4.1.9 to 4.1.11** to address path traversal / arbitrary file read via the `@vitest/mocker` redirect mock (GHSA-82fw-gwwq-j7x9, Dependabot [#290](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/290) / [#280](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/280)). Updated the current version's lockfile, covering nine packages including `@vitest/mocker`.
-- **Updated the frontend development dependency `browserslist` from 4.28.2 to 4.28.9** to address crashes and prototype writes through untrusted custom statistics JSON (GHSA-73wf-gq98-2v4g, Dependabot [#273](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/273)). Updated the current version's lockfile, including five related dependencies.
-- **Updated the frontend development dependency `js-yaml` from 4.3.0 to 4.3.2** to address excessive CPU consumption when resolving `!!omap` (GHSA-5p4m-2wfm-xmqj, Dependabot [#251](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/251)). Updated the current version's lockfile.
-- **[SECURITY] Bumped `starlette` from 1.0.1 to 1.3.1** to resolve Dependabot alerts [#162](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/162) / [#163](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/163) / [#164](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/164) / [#165](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/165) (`starlette < 1.3.1` and related). Also regenerated `uv.lock`.
-- **[SECURITY] Fixed a path traversal in the unauthenticated Excel-conversion API that allowed arbitrary file writes** (GHSA-ghvr-jjv7-mx45): `POST /api/convert/excel-to-markdown` (`excel2md_tool.py` / `excel2md_mermaid_tool.py`) joined the client-supplied upload filename directly into a temporary directory path, so absolute paths or `../` sequences could create or overwrite files outside the temporary directory. Client-supplied filenames are now sanitized with `safe_filename()` (added in `backend/app/safe_path.py`), which strips directory components, with regression tests. Note: the old snapshots `versions/v0.3` / `versions/v0.4` / `versions/v0.5` shared the same flaw; they were left unfixed and removed in this release together with the `versions/` layout (see Changed)
-- **[SECURITY] Pinned the in-house dependency to a tagged git reference**: `add-line-numbers` was pulled in through a local path reference to an in-tree copy (`add-line-numbers/`, v0.1.0) via `path = "../../../add-line-numbers", editable = true`, so the actual dependency contents depended on the state of a working tree outside version control, leaving a path where a swapped reference would not show up in a diff (CWE-829). It is now `{ git = "https://github.com/elvezjp/add-line-numbers.git", tag = "v0.1.3" }`, fetched from the upstream release tag, so updates surface as a `pyproject.toml` diff under review. A `>=0.1.3` floor was also declared in `[project.dependencies]`, and the pytest `pythonpath` entry pointing at the in-tree copy was removed (letting the copy take precedence would defeat the pin). The vendored `add_line_numbers.py` is byte-identical to upstream v0.1.3, so runtime behavior is unchanged. Note: the old snapshots `versions/v0.3` / `versions/v0.4` / `versions/v0.5` still used the local path reference; they were removed in this release together with the `versions/` layout, and the in-tree copy `add-line-numbers/` was removed as well (see Changed / Removed)
-- **Refreshed all backend dependencies**: Regenerated `backend/uv.lock` with `uv lock --upgrade`, updating 30 packages — notably `starlette` 1.3.1 → 1.6.0, `fastapi` 0.137.1 → 0.141.1, `uvicorn` 0.49.0 → 0.52.1, `anthropic` 0.109.2 → 0.121.0, `openai` 2.42.0 → 2.53.0, `boto3` 1.43.31 → 1.43.67, `pandas` 3.0.3 → 3.0.5, `numpy` 2.4.6 → 2.5.1, `markitdown` 0.1.6 → 0.1.7, and `ruff` 0.15.17 → 0.16.2. Verified that the wildcard check the CORS fix relies on (`allow_all_origins = "*" in allow_origins`) is unchanged in Starlette 1.6.0. All 178 tests pass
-- **[SECURITY] Stopped allowing credentials when CORS is open to all origins** (#33): `CORS_ORIGINS` defaults to `*`, and the backend combined that wildcard with `allow_credentials=True`. Starlette cannot serve a wildcard alongside credentials, so it reflects the request's `Origin` back in `Access-Control-Allow-Origin` instead (`allow_all_origins and allow_credentials` → `allow_explicit_origin()`). Any site could therefore reach this API with credentials and read the response — if a user opened a malicious page while the auditor was running locally, the code and design documents under review could be exfiltrated. Credentials are now disabled whenever the origin list is open to all; behavior with an explicit origin list is unchanged. Because Starlette treats the origins as open when the list *contains* `*` (`allow_all_origins = "*" in allow_origins`), the check uses membership rather than equality, so mixed settings such as `CORS_ORIGINS="https://app.example.com,*"` are also covered. Six regression tests added. Note: the old snapshots `versions/v0.3` / `versions/v0.4` / `versions/v0.5` shared the same flaw; they were left unfixed and removed in this release together with the `versions/` layout (see Changed)
-- **[SECURITY] Updated frontend dependencies to resolve Dependabot alerts** (#32): Bumped `react-router-dom` 7.17.0 → 7.18.2 to resolve alerts [#192](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/192) / [#204](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/204) / [#210](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/210) / [#212](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/212) (XSS, route-matching DoS, constructor injection, open redirect), and updated the transitive dev dependencies `js-yaml` 4.2.0 → 4.3.0 (alert [#199](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/199)) and `brace-expansion` → 1.1.16 / 5.0.8 (alert [#186](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/186)), both CPU-consumption DoS. Also preemptively bumped `postcss` 8.5.15 → 8.5.24 (GHSA-r28c-9q8g-f849, arbitrary `.map` file disclosure). Alert [#200](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/200) (GHSA-qwww-vcr4-c8h2, RSC-mode CSRF) was dismissed as not applicable — the unstable RSC APIs are not used and no 7.x patch exists
+- **Fixed a path traversal in the Excel-conversion API that allowed arbitrary file writes** (GHSA-ghvr-jjv7-mx45): `POST /api/convert/excel-to-markdown` joined the client-supplied filename directly into a temporary directory path, so absolute paths or `../` sequences could create or overwrite files outside it. Filenames are now sanitized with `safe_filename()`, which strips directory components, with regression tests
+- **[BREAKING] Changed the CORS default from allow-all (`*`) to local development origins only** (#33, #43): When `CORS_ORIGINS` is unset or blank, only `http://localhost:5173` / `http://127.0.0.1:5173` / `http://localhost:4173` / `http://127.0.0.1:4173` are allowed. Credentials (`allow_credentials`) are never allowed when the setting contains `*`, including mixed values such as `https://app.example.com,*`. Previously the allow-all default combined with `allow_credentials=True` made Starlette echo the requesting Origin, so any site could read responses containing the code and design documents under audit. **Note:** the frontend calls the API from the same origin, so typical setups are unaffected; if you call the API from a different origin, set `CORS_ORIGINS` explicitly
+- **Switched the in-house tool `add-line-numbers` to a tagged git dependency** (#35, CWE-829): It is now fetched from the upstream release tag `v0.1.3` instead of a local path reference to an in-tree copy. Runtime behavior is unchanged
+- **Documented that the tool is intended for local use** (#43): The tool has no authentication or authorization, so README / SECURITY gained an "Intended environment" section and the launch examples now use `--host 127.0.0.1`. SECURITY now supports the latest version only, and vulnerability reports go through private channels only (GitHub private vulnerability reporting or email)
+- **Updated dependencies to address known vulnerabilities**:
+  - Backend: `starlette` 1.0.1 → 1.6.0 (Dependabot alerts #162–#165). `uv lock --upgrade` updated 30 packages in total, including `fastapi` 0.141.1, `uvicorn` 0.52.1, `anthropic` 0.121.0, and `openai` 2.53.0
+  - Frontend: `react-router-dom` 7.17.0 → 7.18.2 (XSS, route-matching DoS, constructor injection, open redirect; #32), `vitest` 4.1.9 → 4.1.11 (GHSA-82fw-gwwq-j7x9), `browserslist` 4.28.2 → 4.28.9 (GHSA-73wf-gq98-2v4g), `js-yaml` 4.2.0 → 4.3.2 (GHSA-5p4m-2wfm-xmqj and others), `brace-expansion` → 1.1.16 / 5.0.8, `postcss` 8.5.15 → 8.5.24 (GHSA-r28c-9q8g-f849)
+  - GHSA-qwww-vcr4-c8h2 (CSRF in `react-router` RSC mode) was dismissed: the affected feature is not used and no 7.x fix exists
+
+### Fixed
+- **Fixed `/health` returning 404** (#43): The route was registered after the static file mount at `/`, which shadowed it. The registration order was swapped and a regression test added
 
 ### Changed
-- **[BREAKING] Retired the `versions/` directory and moved to a layout that keeps only the latest code at the repository root** (#24): The repository kept a full snapshot of every release (v0.3 / v0.4 / v0.5 / v0.5.1) under `versions/`, which caused duplicate Dependabot alerts against the lockfiles of old versions and an out-of-scope triage on every security fix. `versions/v0.5.1/backend` and `frontend` were promoted to `backend/` and `frontend/` at the root; `spec.md` / `config-file-generator-spec.md` moved to `docs/`, and the developer-facing design document (formerly `versions/v0.5.1/README.md`) moved to `docs/design.md`. `versions/v0.3`, `v0.4`, `v0.5`, and `versions/README.md` were removed, and the CI `working-directory` now points at the root layout. The old layout (`versions/` plus the in-tree copies) is preserved under the existing `v0.5.1` tag and can be inspected with `git checkout v0.5.1` (no per-version tags are created retroactively). Going forward, changes for the next release accumulate on main and a `vX.Y.Z` tag is created at release time
-- **Updated the documentation for the single-version layout and git-tag based releases** (#24, #26): The setup and test steps in README / CONTRIBUTING now use the root layout (`cd backend` / `cd frontend`), and README gained "Related Projects" and "Version Management" sections describing how to inspect the old layout with `git checkout v0.5.1`. It also states that the code under the `v0.5.1` tag is a frozen snapshot that does not include this release's security fixes and is for reference and verification only. The Dependabot alert policy in README / SECURITY dropped the wording that assumed dismissing alerts for old versions and git subtree directories, and now covers the root lockfiles only
-- **Changed the frontend CI Node.js matrix from `["20", "23"]` to `["20", "24"]`**: Node.js 23 is an odd-numbered release that has reached end of life and is outside the range supported by `vitest` 4.1.11 (`^20.0.0 || ^22.0.0 || >=24.0.0`). CI now tests on Node.js 20 and the Node.js 24 LTS line.
-- **[BREAKING] Migrated `excel2md` from `sys.path` injection of an in-tree copy to a PyPI dependency** (#26): `excel2md_tool.py` / `excel2md_mermaid_tool.py` loaded the in-tree copy `excel2md/v2.1.1` by injecting it into `sys.path` at runtime, leaving `excel2md` as the only package outside the dependency management in `pyproject.toml`. `excel2md>=2.2.1` is now declared in `dependencies` (published on PyPI, so no `[tool.uv.sources]` entry is needed; the lock resolves to 2.3.0), and the tools use ordinary imports of `excel2md.cli.build_argparser` / `excel2md.runner.run`. As a result, the `EXCEL2MD_PATH` environment variable, which pointed the backend at an excel2md outside the tree, has been removed. Verified that converting the sample policy workbook (`docs/ai-auditor-format/`) yields identical output before and after the migration for both excel2md and excel2md-mermaid, apart from the generation timestamp line. All 178 tests pass
+- **[BREAKING] Retired the `versions/` directory and moved to a layout that keeps only the latest code at the repository root** (#24): `backend` and `frontend` under `versions/v0.5.1/` moved to the root, the specifications moved to `docs/`, and the snapshots of old versions (v0.3 / v0.4 / v0.5) were removed. This ends the duplicate Dependabot alerts against the lockfiles of old versions. The old layout is preserved under the `v0.5.1` tag and can be inspected with `git checkout v0.5.1` (the code under that tag does not include this release's security fixes). Going forward, a `vX.Y.Z` tag is created at release time
+- **[BREAKING] Migrated `excel2md` from `sys.path` injection of an in-tree copy to a PyPI dependency** (#26): `excel2md>=2.2.1` was added as a dependency (v2.1.1 → v2.3.0). The `EXCEL2MD_PATH` environment variable has been removed. Verified that converting the sample policy workbook yields identical output before and after the migration
+- **Updated the documentation for the single-version layout and git-tag based releases** (#24, #26): The steps in README / CONTRIBUTING now use the root layout, README gained "Related Projects" and "Version Management" sections, and the Dependabot alert policy now covers the root lockfiles only
+- **Aligned the Node.js requirement with the dependencies** (#43): 20.19+ (20.x) / 22.12+ (22.x) / 24+. The frontend CI Node.js matrix also changed from `["20", "23"]` to `["20", "24"]`
 
 ### Removed
-- **Removed the unused version-switching code** (#24): The frontend's `VersionSelector` / `useVersions` / `DEFAULT_VERSIONS` / `VersionInfo` were only exported from `core/index.ts` and referenced by neither the UI nor the tests, so they were removed. No change to what the UI shows or does
-- **[BREAKING] Removed the in-tree copies of the in-house tools, `add-line-numbers/` and `excel2md/`** (#24, #26): Both were pulled into the repository root via git subtree, but `add-line-numbers` is now a git dependency pinned to an upstream release tag and `excel2md` a PyPI dependency, so nothing referenced the copies any more. Keeping them made upstream updates impossible to pick up, and Dependabot treated the manifests inside them as independent dependency sets, causing duplicate alerts. `add-line-numbers/` could not be removed while the old versions (`versions/v0.3`–`v0.5`) still used a local path reference to it; retiring `versions/` unblocked the removal and completes the remediation of the path where the actual dependency contents depended on working-tree state outside version control (CWE-829). The dependency manifests in the repository went from 19 files to 4 (`backend/pyproject.toml`, `backend/uv.lock`, `frontend/package.json`, `frontend/package-lock.json`). To read the sources, clone the upstream repositories ([add-line-numbers](https://github.com/elvezjp/add-line-numbers), [excel2md](https://github.com/elvezjp/excel2md))
+- **[BREAKING] Removed the in-tree copies of the in-house tools, `add-line-numbers/` and `excel2md/`** (#24, #26): They had already moved to a git dependency and a PyPI dependency respectively and were no longer referenced. The dependency manifests in the repository went from 19 files to 4. To read the sources, clone the upstream repositories ([add-line-numbers](https://github.com/elvezjp/add-line-numbers), [excel2md](https://github.com/elvezjp/excel2md))
+- **Removed the unused version-switching code** (#24): The frontend's `VersionSelector` / `useVersions` and related code. No change to what the UI shows or does
 
 ## [0.5.1] - 2026-05-11
 
@@ -130,6 +134,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Key Features |
 |---------|-------------|
+| 0.6.0   | Retired `versions/` and moved to a root layout, excel2md migrated to PyPI, security fixes (path traversal in the Excel-conversion API, CORS default restricted to local origins), `/health` 404 fix |
 | 0.5.1   | Path Traversal vulnerability fix, excel2md subtree updated to v2.1.1 |
 | 0.5.0   | Windows static analysis support, CP932 encoding support, test stabilization |
 | 0.4.0   | AI Auditor format Excel support, policy selection feature |
@@ -138,23 +143,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Feature Matrix
 
-| Feature | v0.5.1 | v0.5 | v0.4 | v0.3 | v0.1 |
-|---------|--------|------|------|------|------|
-| Java file upload | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Rule prompt management | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Real-time progress | ✅ | ✅ | ✅ | ✅ | ✅ |
-| LLM audit execution | ✅ | ✅ | ✅ | ✅ | ⚠️ |
-| Static analysis (Checkstyle/PMD) | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Static analysis (Ruff/Flake8/Pylint) | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Result filtering | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Markdown report output | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Config file generator | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Unit tests | ✅ | ✅ | ✅ | ✅ | ❌ |
-| AI Auditor format Excel | ✅ | ✅ | ✅ | ❌ | ❌ |
-| Policy selection feature | ✅ | ✅ | ✅ | ❌ | ❌ |
-| Windows static analysis | ✅ | ✅ | ❌ | ❌ | ❌ |
-| CP932 encoding support | ✅ | ✅ | ❌ | ❌ | ❌ |
-| Path Traversal vulnerability fix (#19) | ✅ | ⚠️ | ⚠️ | ⚠️ | - |
-| excel2md subtree version | v2.1.1 | v2.0 | v2.0 | v2.0 | - |
+| Feature | v0.6.0 | v0.5.1 | v0.5 | v0.4 | v0.3 | v0.1 |
+|---------|--------|--------|------|------|------|------|
+| Java file upload | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Rule prompt management | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Real-time progress | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| LLM audit execution | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ |
+| Static analysis (Checkstyle/PMD) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Static analysis (Ruff/Flake8/Pylint) | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
+| Result filtering | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Markdown report output | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Config file generator | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
+| Unit tests | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
+| AI Auditor format Excel | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| Policy selection feature | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| Windows static analysis | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| CP932 encoding support | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Path Traversal vulnerability fix (#19) | ✅ | ✅ | ⚠️ | ⚠️ | ⚠️ | - |
+| excel2md version (subtree up to v0.5.1) | v2.3.0 (PyPI) | v2.1.1 | v2.0 | v2.0 | v2.0 | - |
+| Path traversal fix in the Excel-conversion API (GHSA-ghvr-jjv7-mx45) | ✅ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | - |
+| CORS default restricted to local origins / no credentials when open to all | ✅ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | - |
 
 **Legend**: ✅ Implemented / ⚠️ Has issues / ❌ Not implemented

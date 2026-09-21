@@ -75,7 +75,7 @@
 ### 前提条件
 
 - Python 3.11 以上
-- Node.js 20.0.0 以上
+- Node.js 20.19以上（20.x）、22.12以上（22.x）、または24以上
 - [uv](https://docs.astral.sh/uv/) パッケージマネージャー
 - AWS アカウント（任意。Bedrock を使った監査実行時のみ必要）
 
@@ -103,7 +103,7 @@ cd backend
 uv run pytest tests/ -v
 
 # 特定のテストファイルを実行
-uv run pytest tests/test_audit.py -v
+uv run pytest tests/test_convert_api.py -v
 
 # カバレッジ付きで実行
 uv run pytest tests/ --cov=app --cov-report=html

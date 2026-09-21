@@ -18,6 +18,16 @@ https://github.com/user-attachments/assets/01b8fe08-861b-473a-8f1a-f4de00f751f4
 
 ---
 
+## Intended Environment
+
+This tool is intended for local use and has no application authentication or authorization. Anyone who can reach it may invoke the LLM using server credentials and incur charges.
+
+- Start the backend with `--host 127.0.0.1`.
+- If exposing it on a network, require authentication at a reverse proxy and restrict direct access to the backend.
+- CORS defaults to `http://localhost:5173`, `http://127.0.0.1:5173`, `http://localhost:4173`, and `http://127.0.0.1:4173`, including when unset or blank.
+- Set `CORS_ORIGINS` explicitly for other origins. Credentials are disabled whenever the list contains `*`. Avoid allow-all settings. CORS does not replace authentication or network access controls.
+
+
 ## Features
 
 - **Judgment-based rule auditing**: Detects semantic and subjective coding standard violations that linters cannot catch
@@ -48,7 +58,7 @@ https://github.com/user-attachments/assets/01b8fe08-861b-473a-8f1a-f4de00f751f4
 ### System Requirements
 
 - **OS**: macOS / Linux / Windows (WSL recommended)
-- **Node.js**: 20.0.0 or higher
+- **Node.js**: 20.19+ (20.x), 22.12+ (22.x), or 24+
 - **Python**: 3.11 or higher
 
 ### 1. Install Required Tools
@@ -85,7 +95,7 @@ cp .env.example .env
 
 # Install dependencies and start server using uv
 uv sync
-uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+uv run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 The backend API starts at `http://localhost:8000`.
@@ -118,7 +128,7 @@ CORS_ORIGINS=http://localhost:5173
 cd frontend && npm run dev
 
 # Start backend (Terminal 2)
-cd backend && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+cd backend && uv run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 
 # Access http://localhost:5173 in your browser
 ```
