@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 - **Removed the unused version-switching code** (#24): The frontend's `VersionSelector` / `useVersions` / `DEFAULT_VERSIONS` / `VersionInfo` were only exported from `core/index.ts` and referenced by neither the UI nor the tests, so they were removed. No change to what the UI shows or does
+- **[BREAKING] Removed the in-tree copies of the in-house tools, `add-line-numbers/` and `excel2md/`** (#24, #26): Both were pulled into the repository root via git subtree, but `add-line-numbers` is now a git dependency pinned to an upstream release tag and `excel2md` a PyPI dependency, so nothing referenced the copies any more. Keeping them made upstream updates impossible to pick up, and Dependabot treated the manifests inside them as independent dependency sets, causing duplicate alerts. `add-line-numbers/` could not be removed while the old versions (`versions/v0.3`–`v0.5`) still used a local path reference to it; retiring `versions/` unblocked the removal and completes the remediation of the path where the actual dependency contents depended on working-tree state outside version control (CWE-829). The dependency manifests in the repository went from 19 files to 4 (`backend/pyproject.toml`, `backend/uv.lock`, `frontend/package.json`, `frontend/package-lock.json`). To read the sources, clone the upstream repositories ([add-line-numbers](https://github.com/elvezjp/add-line-numbers), [excel2md](https://github.com/elvezjp/excel2md))
 
 ## [0.5.1] - 2026-05-11
 
