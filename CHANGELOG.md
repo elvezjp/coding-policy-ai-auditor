@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **Changed the frontend CI Node.js matrix from `["20", "23"]` to `["20", "24"]`**: Node.js 23 is an odd-numbered release that has reached end of life and is outside the range supported by `vitest` 4.1.11 (`^20.0.0 || ^22.0.0 || >=24.0.0`). CI now tests on Node.js 20 and the Node.js 24 LTS line.
+- **[BREAKING] Migrated `excel2md` from `sys.path` injection of an in-tree copy to a PyPI dependency** (#26): `excel2md_tool.py` / `excel2md_mermaid_tool.py` loaded the in-tree copy `excel2md/v2.1.1` by injecting it into `sys.path` at runtime, leaving `excel2md` as the only package outside the dependency management in `pyproject.toml`. `excel2md>=2.2.1` is now declared in `dependencies` (published on PyPI, so no `[tool.uv.sources]` entry is needed; the lock resolves to 2.3.0), and the tools use ordinary imports of `excel2md.cli.build_argparser` / `excel2md.runner.run`. As a result, the `EXCEL2MD_PATH` environment variable, which pointed the backend at an excel2md outside the tree, has been removed. Verified that converting the sample policy workbook (`docs/ai-auditor-format/`) yields identical output before and after the migration for both excel2md and excel2md-mermaid, apart from the generation timestamp line. All 178 tests pass
+
+### Removed
+- **Removed the unused version-switching code** (#24): The frontend's `VersionSelector` / `useVersions` / `DEFAULT_VERSIONS` / `VersionInfo` were only exported from `core/index.ts` and referenced by neither the UI nor the tests, so they were removed. No change to what the UI shows or does
 
 ## [0.5.1] - 2026-05-11
 

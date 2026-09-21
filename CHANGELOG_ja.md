@@ -22,6 +22,10 @@
 
 ### 変更
 - **フロントエンド CI の Node.js マトリクスを `["20", "23"]` → `["20", "24"]` に変更**: Node.js 23 はサポートが終了した奇数版で、`vitest` 4.1.11 の対応範囲（`^20.0.0 || ^22.0.0 || >=24.0.0`）外のため。Node.js 20 と LTS 系の Node.js 24 でテストする。
+- **[BREAKING] `excel2md` を同梱ディレクトリの `sys.path` 注入から PyPI 依存に移行** (#26): `excel2md_tool.py` / `excel2md_mermaid_tool.py` は、リポジトリ直下に同梱した `excel2md/v2.1.1` を `sys.path` に動的注入して読み込んでおり、`excel2md` だけが `pyproject.toml` の依存管理の外にあった。`dependencies` に `excel2md>=2.2.1` を追加し（PyPI 公開済みのため `[tool.uv.sources]` は不要。lock 上は 2.3.0）、`excel2md.cli.build_argparser` / `excel2md.runner.run` の通常 import に書き換えた。これに伴い、同梱外の excel2md を指定するための環境変数 `EXCEL2MD_PATH` は廃止した。サンプル規約 Excel（`docs/ai-auditor-format/`）の変換結果は、excel2md / excel2md-mermaid とも移行前後で生成日時の行を除き一致することを確認済み。全 178 テストがパス
+
+### 削除
+- **未使用のバージョン切替コードを削除** (#24): フロントエンドの `VersionSelector` / `useVersions` / `DEFAULT_VERSIONS` / `VersionInfo` は `core/index.ts` から export されているだけで、画面・テストのいずれからも参照されていなかったため削除した。画面の表示・挙動に変更はない
 
 ## [0.5.1] - 2026-05-11
 
