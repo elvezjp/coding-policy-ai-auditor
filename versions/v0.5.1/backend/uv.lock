@@ -220,6 +220,7 @@ dependencies = [
     { name = "add-line-numbers" },
     { name = "anthropic" },
     { name = "boto3" },
+    { name = "excel2md" },
     { name = "fastapi" },
     { name = "markitdown", extra = ["xlsx"] },
     { name = "openai" },
@@ -249,6 +250,7 @@ requires-dist = [
     { name = "add-line-numbers", git = "https://github.com/elvezjp/add-line-numbers.git?tag=v0.1.3" },
     { name = "anthropic", specifier = ">=0.40.0" },
     { name = "boto3", specifier = ">=1.35.0" },
+    { name = "excel2md", specifier = ">=2.2.1" },
     { name = "fastapi", specifier = ">=0.115.0" },
     { name = "flake8", marker = "extra == 'flake8'", specifier = ">=6.0.0" },
     { name = "markitdown", extras = ["xlsx"], specifier = ">=0.0.1a3" },
@@ -332,6 +334,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/d3/38/af70d7ab1ae9d4da450eeec1fa3918940a5fafb9055e934af8d6eb0c2313/et_xmlfile-2.0.0.tar.gz", hash = "sha256:dab3f4764309081ce75662649be815c4c9081e88f0837825f90fd28317d4da54", size = 17234, upload-time = "2024-10-25T17:25:40.039Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c1/8b/5fe2cc11fee489817272089c4203e679c63b570a5aaeb18d852ae3cbba6a/et_xmlfile-2.0.0-py3-none-any.whl", hash = "sha256:7a91720bc756843502c3b7504c77b8fe44217c85c537d85037f0f536151b2caa", size = 18059, upload-time = "2024-10-25T17:25:39.051Z" },
+]
+
+[[package]]
+name = "excel2md"
+version = "2.3.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "openpyxl" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/10/4b/3127d00f84f9fe7e3cddb88e7c999d82bc0c18acc5ad191b616eef6a5fd6/excel2md-2.3.0.tar.gz", hash = "sha256:12156d0d37006ae2f3dabcbaea9524a35fb774f8c7eb9c54c86b2faa56fbce66", size = 69600, upload-time = "2026-07-03T00:44:19.467Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/84/d9/d9ec4af7c21a4a04ae8277300feb0cd3138c75dbf9603fe387dd8d4187c2/excel2md-2.3.0-py3-none-any.whl", hash = "sha256:1379d30330441eaa2330f44761fffd7997da15d4a37cad5d0266ff2c566fe74e", size = 60328, upload-time = "2026-07-03T00:44:18.326Z" },
 ]
 
 [[package]]
