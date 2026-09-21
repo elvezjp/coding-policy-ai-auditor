@@ -103,7 +103,7 @@ cd backend
 uv run pytest tests/ -v
 
 # Run a specific test file
-uv run pytest tests/test_audit.py -v
+uv run pytest tests/test_convert_api.py -v
 
 # Run with coverage
 uv run pytest tests/ --cov=app --cov-report=html
