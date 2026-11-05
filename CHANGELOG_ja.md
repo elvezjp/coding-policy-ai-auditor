@@ -7,6 +7,25 @@
 フォーマットは [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) に基づいており、
 このプロジェクトは [セマンティックバージョニング](https://semver.org/lang/ja/) に準拠しています。
 
+## [0.6.1] - 未リリース
+
+### セキュリティ
+
+- **推移的依存の `certifi` と `urllib3` の下限を引き上げ**（Dependabot [#324](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/324) / [#313](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/313) / [#312](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/312)）
+  - [GHSA-6q48-6c7w-9gw2](https://github.com/advisories/GHSA-6q48-6c7w-9gw2)（critical）: `certifi` < 2026.10.18 が、中間 CA の鍵が漏えいした emSign のルート CA を同梱していた
+  - [GHSA-vxq7-64xx-v4gw](https://github.com/advisories/GHSA-vxq7-64xx-v4gw)（high）/ [GHSA-gh4c-6fx4-qh6g](https://github.com/advisories/GHSA-gh4c-6fx4-qh6g)（medium）: `urllib3` < 2.8.0 で、チャンクサイズ行を上限なくメモリに読み込む可能性と、Deflate のチャンクストリーミングで無限ループに陥る可能性があった
+  - いずれも `backend/pyproject.toml` の `[tool.uv]` `constraint-dependencies`（`certifi>=2026.10.18`、`urllib3>=2.8.0`）として宣言する
+  - `backend/uv.lock` を再生成: `certifi` 2026.7.22 → 2026.10.23、`urllib3` 2.7.0 → 2.8.0
+- **`pylint` の下限を `>= 4.0.9` に引き上げ**（Dependabot [#323](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/323)）
+  - [GHSA-22qq-2fwx-7p67](https://github.com/advisories/GHSA-22qq-2fwx-7p67)（medium）: `pylint` < 4.0.9 が `PYLINT_HOME` の stats キャッシュを pickle で読み込んでおり、任意コード実行につながる可能性があった。バックエンドは受け取ったコードに対して `pylint` を実行するため、実行時の依存にあたる
+  - `backend/uv.lock` を再生成: `pylint` 4.0.6 → 4.1.3、`astroid` 4.0.4 → 4.3.4
+- **フロントエンドの開発用依存を更新**（Dependabot [#322](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/322) / [#321](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/321) / [#320](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/320) / [#319](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/319) / [#318](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/318) / [#317](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/317) / [#316](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/316) / [#315](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/315) / [#314](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/314)）: `vite` 8.0.16 → 8.1.6、`vitest` 4.1.11 → 4.1.12、`source-map-js` 1.2.1 → 1.2.2、`brace-expansion` 1.1.16 → 1.1.21 / 5.0.8 → 5.0.12
+  - `vite`: [GHSA-587h-7wmj-h5pm](https://github.com/advisories/GHSA-587h-7wmj-h5pm)（high）、[GHSA-r825-w8mm-5pxw](https://github.com/advisories/GHSA-r825-w8mm-5pxw)（medium）、[GHSA-698v-4r3x-3vcv](https://github.com/advisories/GHSA-698v-4r3x-3vcv)（medium）、[GHSA-rq7h-c2jc-7f22](https://github.com/advisories/GHSA-rq7h-c2jc-7f22)（medium）、[GHSA-9jrq-w75r-8gcw](https://github.com/advisories/GHSA-9jrq-w75r-8gcw)（low）（バンドルされた launch-editor の Windows でのコマンド実行関連、`server.fs.allow` の回避、カスタムミドルウェア経由のクロスオリジンでのスクリプト実行）
+  - `@vitest/mocker`（`vitest` 経由）: [GHSA-qxg6-89mg-rqv8](https://github.com/advisories/GHSA-qxg6-89mg-rqv8)（medium）、[GHSA-xp26-3454-mjgp](https://github.com/advisories/GHSA-xp26-3454-mjgp)（medium）（Windows でのパス走査、未認証の手動モック登録によるコードインジェクション）
+  - `source-map-js`: [GHSA-68fv-2mgg-jv7q](https://github.com/advisories/GHSA-68fv-2mgg-jv7q)（high、イベントループの DoS）、`brace-expansion`: [GHSA-q2hr-2g5m-vwhr](https://github.com/advisories/GHSA-q2hr-2g5m-vwhr)（medium、CPU の DoS）
+  - あわせて `nanoid` 3.3.16 → 3.3.20（`vite` → `postcss` 経由。[GHSA-2v37-7h3g-55p8](https://github.com/advisories/GHSA-2v37-7h3g-55p8)、high、サイズ 0 の独自生成関数で無限ループ）と `zod` 4.4.3 → 4.6.7（`eslint-plugin-react-hooks` 経由。[GHSA-mrhx-c7xc-m3w5](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5)、high、サイズ制約付きの大きなコレクションの検証でメモリを使い切る）を更新。いずれも `npm audit` が報告したもので、Dependabot アラートは出ていない
+  - いずれも開発サーバー・ビルド・テストでのみ使う開発用依存で、ビルド後のフロントエンドには含まれない
+
 ## [0.6.0] - 2026-09-21
 
 `versions/` ディレクトリを廃止して最新コードのみをルート直下で保持する構成へ移行し、あわせてセキュリティ修正と依存関係の更新を行ったリリース。

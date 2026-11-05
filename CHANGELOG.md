@@ -7,6 +7,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.1] - Unreleased
+
+### Security
+
+- **Raised the floor of the transitive dependencies `certifi` and `urllib3`** (Dependabot [#324](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/324) / [#313](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/313) / [#312](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/312))
+  - [GHSA-6q48-6c7w-9gw2](https://github.com/advisories/GHSA-6q48-6c7w-9gw2) (critical): `certifi` < 2026.10.18 bundled emSign root CAs whose intermediate CA keys were compromised
+  - [GHSA-vxq7-64xx-v4gw](https://github.com/advisories/GHSA-vxq7-64xx-v4gw) (high) / [GHSA-gh4c-6fx4-qh6g](https://github.com/advisories/GHSA-gh4c-6fx4-qh6g) (medium): `urllib3` < 2.8.0 could buffer an unbounded chunk-size line into memory, and could loop forever on chunked deflate streams
+  - Both are declared as `[tool.uv]` `constraint-dependencies` (`certifi>=2026.10.18`, `urllib3>=2.8.0`) in `backend/pyproject.toml`
+  - `backend/uv.lock` regenerated: `certifi` 2026.7.22 → 2026.10.23, `urllib3` 2.7.0 → 2.8.0
+- **Raised the floor of `pylint` to `>= 4.0.9`** (Dependabot [#323](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/323))
+  - [GHSA-22qq-2fwx-7p67](https://github.com/advisories/GHSA-22qq-2fwx-7p67) (medium): `pylint` < 4.0.9 deserialized the stats cache in `PYLINT_HOME` with pickle, allowing arbitrary code execution. The backend runs `pylint` on submitted code, so this is a runtime dependency
+  - `backend/uv.lock` regenerated: `pylint` 4.0.6 → 4.1.3, `astroid` 4.0.4 → 4.3.4
+- **Updated frontend development dependencies** (Dependabot [#322](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/322) / [#321](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/321) / [#320](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/320) / [#319](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/319) / [#318](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/318) / [#317](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/317) / [#316](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/316) / [#315](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/315) / [#314](https://github.com/elvezjp/coding-policy-ai-auditor/security/dependabot/314)): `vite` 8.0.16 → 8.1.6, `vitest` 4.1.11 → 4.1.12, `source-map-js` 1.2.1 → 1.2.2, `brace-expansion` 1.1.16 → 1.1.21 / 5.0.8 → 5.0.12
+  - `vite`: [GHSA-587h-7wmj-h5pm](https://github.com/advisories/GHSA-587h-7wmj-h5pm) (high), [GHSA-r825-w8mm-5pxw](https://github.com/advisories/GHSA-r825-w8mm-5pxw) (medium), [GHSA-698v-4r3x-3vcv](https://github.com/advisories/GHSA-698v-4r3x-3vcv) (medium), [GHSA-rq7h-c2jc-7f22](https://github.com/advisories/GHSA-rq7h-c2jc-7f22) (medium), [GHSA-9jrq-w75r-8gcw](https://github.com/advisories/GHSA-9jrq-w75r-8gcw) (low) (command execution issues in the bundled launch-editor on Windows, a `server.fs.allow` bypass, and cross-origin script execution through custom middleware)
+  - `@vitest/mocker` (pulled in by `vitest`): [GHSA-qxg6-89mg-rqv8](https://github.com/advisories/GHSA-qxg6-89mg-rqv8) (medium), [GHSA-xp26-3454-mjgp](https://github.com/advisories/GHSA-xp26-3454-mjgp) (medium) (Windows path traversal, code injection via unauthenticated manual mock registration)
+  - `source-map-js`: [GHSA-68fv-2mgg-jv7q](https://github.com/advisories/GHSA-68fv-2mgg-jv7q) (high, event-loop DoS); `brace-expansion`: [GHSA-q2hr-2g5m-vwhr](https://github.com/advisories/GHSA-q2hr-2g5m-vwhr) (medium, CPU DoS)
+  - Also updated `nanoid` 3.3.16 → 3.3.20 (pulled in by `vite` → `postcss`; [GHSA-2v37-7h3g-55p8](https://github.com/advisories/GHSA-2v37-7h3g-55p8), high, infinite loop in custom generators when size is zero) and `zod` 4.4.3 → 4.6.7 (pulled in by `eslint-plugin-react-hooks`; [GHSA-mrhx-c7xc-m3w5](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5), high, memory exhaustion when validating oversized constrained collections). These were reported by `npm audit` but have no Dependabot alert
+  - These are development-only dependencies (dev server, build and tests) and are not included in the built frontend
+
 ## [0.6.0] - 2026-09-21
 
 This release retires the `versions/` directory in favor of a layout that keeps only the latest code at the repository root, together with security fixes and dependency updates.

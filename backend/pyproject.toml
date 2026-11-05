@@ -15,7 +15,7 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "add-line-numbers>=0.1.3",
     "excel2md>=2.2.1",
-    "pylint>=3.0.0",
+    "pylint>=4.0.9",
 ]
 
 [project.optional-dependencies]
@@ -36,6 +36,16 @@ packages = ["app"]
 dev-dependencies = [
     "pytest>=8.0.0",
     "httpx>=0.27.0",
+]
+# Security: raise the floor of the transitive dependencies `certifi` and `urllib3`.
+#   - certifi < 2026.10.18 bundles emSign root CAs whose intermediate CA keys
+#     were compromised (GHSA-6q48-6c7w-9gw2)
+#   - urllib3 < 2.8.0 buffers an unbounded chunk-size line into memory
+#     (GHSA-vxq7-64xx-v4gw) and can loop forever on chunked deflate streams
+#     (GHSA-gh4c-6fx4-qh6g)
+constraint-dependencies = [
+    "certifi>=2026.10.18",
+    "urllib3>=2.8.0",
 ]
 
 [tool.pytest.ini_options]
