@@ -59,7 +59,7 @@ https://github.com/user-attachments/assets/01b8fe08-861b-473a-8f1a-f4de00f751f4
 
 - **OS**: macOS / Linux / Windows（WSL推奨）
 - **Node.js**: 20.19以上（20.x）、22.12以上（22.x）、または24以上
-- **Python**: 3.11 以上
+- **Python**: 3.11.5 以上
 
 ### 1. 必要なツールをインストールする
 
