@@ -59,7 +59,7 @@ This tool is intended for local use and has no application authentication or aut
 
 - **OS**: macOS / Linux / Windows (WSL recommended)
 - **Node.js**: 20.19+ (20.x), 22.12+ (22.x), or 24+
-- **Python**: 3.11 or higher
+- **Python**: 3.11.5 or higher
 
 ### 1. Install Required Tools
 
